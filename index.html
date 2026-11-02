@@ -590,7 +590,7 @@ function tr(){var n=sel.cs.length,t=tier(n),nx=tier(n+1),p=cur(),h='',up='';
  else h='🎁 مبروك! اخترت '+n+' دورات = <b>'+t.n+' '+'⭐'.repeat(t.st)+'</b> بـ <b>'+m(t.p)+'</b> بدل <s>'+m(p.sep)+'</s> — <b>ربحت '+m(p.sep-t.p)+' في جيبك</b>'+up;
  $('tr').className='tier'+(n>1?' ok':'');$('tr').innerHTML=h}
 function sum(){var p=cur(),sh=rate(),cc=sel.pay=='ccp';$('sp').textContent=p?p.n:'—';$('sq').textContent=p?m(p.p):'—';$('sl').textContent='سعر التوصيل ('+co().n+(sel.t=='o'?' · مكتب':' · منزل')+')';$('ss').textContent=m(sh);$('st').textContent=p?m(p.p+sh):'—';
-  $('sx1').className='x'+(cc?' on':'');$('sx2').className='x'+(cc?' on':'');$('sn').textContent=p?m(p.p):'—';$('sd').textContent=sh>0?m(sh):'—';
+  $('sq').parentNode.style.display=cc?'none':'';$('st').parentNode.style.display=cc?'none':'';$('sx1').className='x';$('sx2').className='x';$('sn').textContent=p?m(p.p):'—';$('sd').textContent=sh>0?m(sh):'—';
   $('sb').textContent=cc?'📤 إرسال الوصل وتأكيد الطلب':'✅ تأكيد طلب الدورة'}
 function tog(id,on){var i=sel.cs.indexOf(id);if(on==null)on=i<0;if(on&&i<0)sel.cs.push(id);if(!on&&i>-1)sel.cs.splice(i,1)}
 document.addEventListener('click',function(e){
@@ -662,7 +662,7 @@ $('f').addEventListener('submit',function(e){e.preventDefault();var er=$('er');e
   var c=co(),sh=rate(),tot=p.p+sh,dl=sel.t=='o'?'لمكتب التوصيل':'للمنزل',paid=cc?p.p:0,due=tot-paid;
   var ok_=oKey(nm,ph,p.ids.join('+')),bl=oCheck(ok_);if(bl>0)return er.textContent=oMsg(bl);
   var oid=genId();
-  var data={orderId:oid,items:p.items.join(' + '),fullName:nm,phone:ph,phone2:ph2,wilaya:W[sel.w-1],commune:cmv,delivery:dl,product:p.val,price:String(p.p),deliveryCompany:c.n,shipping:String(sh),total:String(tot),
+  var data={orderId:oid,items:p.items.join(' + '),fullName:nm,phone:ph,phone2:ph2,wilaya:W[sel.w-1],commune:cmv,delivery:dl,product:p.val,price:String(cc?0:p.p),deliveryCompany:c.n,shipping:String(sh),total:String(cc?sh:tot),
     paymentMethod:cc?'بريدي موب / CCP':'الدفع عند الاستلام',paidNow:String(paid),dueOnDelivery:String(due),receipt:cc?'أُرسل عبر واتساب':''};
   var sb=$('sb');sb.disabled=true;sb.textContent='جارٍ تسجيل الطلب...';
   function fin(rcOk){oBump(ok_);fire(C.PX_EVENT||'Purchase',{value:tot,currency:'DZD',content_ids:p.ids,content_name:p.n,content_type:'product',num_items:p.ids.length},{name:nm,phone:ph,wilaya:W[sel.w-1],commune:cmv});$('f').style.display='none';$('done').style.display='block';
