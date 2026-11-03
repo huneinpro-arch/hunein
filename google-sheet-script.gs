@@ -45,6 +45,27 @@ function fields_(p, date, hasOffer) {
   return f;
 }
 
+// يضيف عمودي name و phone بعد order id إن لم يكونا موجودين في الجدول (مرة واحدة فقط)
+function ensureNamePhone_(sh) {
+  var heads = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(norm_);
+  var at = heads.indexOf('orderid');
+  if (at < 0) at = heads.indexOf('رقمالطلب');
+  if (at < 0) at = 0;
+  if (heads.indexOf('name') < 0 && heads.indexOf('الاسم') < 0) {
+    sh.insertColumnAfter(at + 1);
+    sh.getRange(1, at + 2).setValue('name');
+    sh.getRange(1, at + 2).setBackground(sh.getRange(1, at + 1).getBackground());
+    at++;
+  } else {
+    at = Math.max(heads.indexOf('name'), heads.indexOf('الاسم'));
+  }
+  if (heads.indexOf('phone') < 0 && heads.indexOf('الهاتف') < 0) {
+    sh.insertColumnAfter(at + 1);
+    sh.getRange(1, at + 2).setValue('phone');
+    sh.getRange(1, at + 2).setBackground(sh.getRange(1, at + 1).getBackground());
+  }
+}
+
 function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.waitLock(20000);
@@ -54,8 +75,9 @@ function doPost(e) {
     if (!p.fullName && !p.phone) return ContentService.createTextOutput('empty');
 
     var sh = getSheet_();
+    if (sh.getLastRow() === 0 || sh.getLastColumn() === 0) throw new Error('اكتب عناوين الأعمدة في الصف الأول من الجدول');
+    ensureNamePhone_(sh);
     var cols = sh.getLastColumn();
-    if (sh.getLastRow() === 0 || cols === 0) throw new Error('اكتب عناوين الأعمدة في الصف الأول من الجدول');
 
     var heads = sh.getRange(1, 1, 1, cols).getValues()[0].map(norm_);
     // عمود بلا عنوان: بعد product يأخذ أسماء الدورات، وبعد total Prix يأخذ الحالة
