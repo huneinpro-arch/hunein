@@ -1,10 +1,7 @@
-// ===== طلبات حنين → Google Sheet (order_id) =====
+// ===== طلبات حنين → Google Sheet (order id) =====
+// السكربت يقرأ عناوين الصف الأول في جدولك ويضع كل قيمة تحت عنوانها، فيبقى كل شيء في مكانه
+// حتى لو غيّرت ترتيب الأعمدة أو أسماءها (الأسماء المعروفة مذكورة في fields_ بالأسفل).
 var SHEET_ID = '';
-
-// ترتيب الأعمدة كما في جدولك: date, order_id, name, phone, wilaya, baladia, address, product, qty, base_price, offer_price
-// ثم الأعمدة التي بعدها (غيّر أسماءها وترتيبها هنا بما يوافق جدولك)
-var HEADERS = ['date','order_id','name','phone','wilaya','baladia','address','product','qty','base_price','offer_price',
-  'shipping','total','delivery','company','status','payment_method','paid_now'];
 
 function getSheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -13,6 +10,38 @@ function getSheet_() {
     ss = SpreadsheetApp.openById(SHEET_ID);
   }
   return ss.getSheets()[0];
+}
+
+// يوحّد اسم العمود: بدون مسافات أو _ أو - وبحروف صغيرة
+function norm_(h) {
+  return String(h).toLowerCase().replace(/[\s_\-]/g, '');
+}
+
+// كل اسم عمود (موحّد) ← قيمته. أضف اسماً بديلاً هنا إن غيّرت اسم عمود في الجدول.
+function fields_(p, date, hasOffer) {
+  var price = Number(p.price) || 0, base = Number(p.basePrice) || 0;
+  var f = {
+    'date': date, 'التاريخ': date,
+    'orderid': p.orderId || '', 'رقمالطلب': p.orderId || '',
+    'name': p.fullName || '', 'الاسم': p.fullName || '',
+    'phone': (p.phone || '') + (p.phone2 ? ' / ' + p.phone2 : ''), 'الهاتف': (p.phone || '') + (p.phone2 ? ' / ' + p.phone2 : ''),
+    'wilaya': p.wilaya || '', 'الولاية': p.wilaya || '',
+    'baladia': p.commune || '', 'commune': p.commune || '', 'البلدية': p.commune || '',
+    'delivery': p.delivery || '', 'نوعالتوصيل': p.delivery || '',
+    'socitedelivraison': p.deliveryCompany || '', 'societedelivraison': p.deliveryCompany || '', 'sociétédelivraison': p.deliveryCompany || '',
+    'company': p.deliveryCompany || '', 'شركةالتوصيل': p.deliveryCompany || '',
+    'product': p.product || '', 'الدورة': p.product || '', 'المنتج': p.product || '',
+    'items': p.items || '', 'الدورات': p.items || '',
+    'qty': Number(p.qty) || 1,
+    'baseprice': hasOffer ? base : price, 'السعر': hasOffer ? base : price,
+    'offerprice': price,
+    'shippingcost': Number(p.shipping) || 0, 'shipping': Number(p.shipping) || 0, 'سعرالتوصيل': Number(p.shipping) || 0,
+    'totalprix': Number(p.total) || 0, 'total': Number(p.total) || 0, 'المجموع': Number(p.total) || 0,
+    'status': 'طلب جديد', 'الحالة': 'طلب جديد',
+    'طريقةالدفع': p.paymentMethod || 'الدفع عند الاستلام', 'paymentmethod': p.paymentMethod || 'الدفع عند الاستلام',
+    'المدفوعالآن': Number(p.paidNow) || 0, 'paidnow': Number(p.paidNow) || 0
+  };
+  return f;
 }
 
 function doPost(e) {
@@ -24,36 +53,26 @@ function doPost(e) {
     if (!p.fullName && !p.phone) return ContentService.createTextOutput('empty');
 
     var sh = getSheet_();
+    var cols = sh.getLastColumn();
+    if (sh.getLastRow() === 0 || cols === 0) throw new Error('اكتب عناوين الأعمدة في الصف الأول من الجدول');
 
-    if (sh.getLastRow() === 0) {
-      sh.appendRow(HEADERS);
-      sh.setFrozenRows(1);
-    }
+    var heads = sh.getRange(1, 1, 1, cols).getValues()[0].map(norm_);
+    var hasOffer = heads.indexOf('offerprice') > -1;
+    var date = Utilities.formatDate(new Date(), 'Africa/Algiers', 'yyyy-MM-dd HH:mm');
+    var f = fields_(p, date, hasOffer);
 
     var row = sh.getLastRow() + 1;
-    var date = Utilities.formatDate(new Date(), 'Africa/Algiers', 'dd/MM/yyyy');
 
     // ينسخ تنسيق الصف السابق ليبقى الجدول متناسقاً
     if (row > 2) {
-      sh.getRange(row - 1, 1, 1, HEADERS.length)
-        .copyTo(sh.getRange(row, 1, 1, HEADERS.length), SpreadsheetApp.CopyPasteType.PASTE_FORMAT, false);
+      sh.getRange(row - 1, 1, 1, cols).copyTo(sh.getRange(row, 1, 1, cols), SpreadsheetApp.CopyPasteType.PASTE_FORMAT, false);
     }
 
-    sh.getRange(row, 4).setNumberFormat('@');
-    sh.getRange(row, 1, 1, HEADERS.length).setValues([[
-      date,
-      p.orderId || '',
-      p.fullName || '',
-      (p.phone || '') + (p.phone2 ? ' / ' + p.phone2 : ''),
-      p.wilaya || '', p.commune || '', '',
-      p.product || '',
-      Number(p.qty) || 1,
-      Number(p.basePrice) || 0, Number(p.price) || 0,
-      Number(p.shipping) || 0, Number(p.total) || 0,
-      p.delivery || '', p.deliveryCompany || '',
-      'طلب جديد',
-      p.paymentMethod || 'الدفع عند الاستلام', Number(p.paidNow) || 0
-    ]]);
+    var phoneCol = heads.indexOf('phone') > -1 ? heads.indexOf('phone') : heads.indexOf('الهاتف');
+    if (phoneCol > -1) sh.getRange(row, phoneCol + 1).setNumberFormat('@');
+
+    var vals = heads.map(function (h) { return f.hasOwnProperty(h) ? f[h] : ''; });
+    sh.getRange(row, 1, 1, cols).setValues([vals]);
 
     return ContentService.createTextOutput('ok');
   } finally {
@@ -69,7 +88,7 @@ function test() {
   doPost({ parameter: {
     orderId: 'HN-TEST', fullName: 'طلب تجريبي', phone: '0550123456', phone2: '',
     wilaya: 'قسنطينة', commune: 'الخروب', delivery: 'للمنزل',
-    deliveryCompany: 'DHD', product: 'حقيبة المهندس برو', qty: '3',
+    deliveryCompany: 'DHD', product: 'حقيبة المهندس برو', items: 'Robot + AutoCAD', qty: '3',
     basePrice: '15000', price: '7500', shipping: '700', total: '8200',
     paymentMethod: 'الدفع عند الاستلام', paidNow: '0'
   }});
