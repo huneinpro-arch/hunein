@@ -1,10 +1,10 @@
 // ===== طلبات حنين → Google Sheet (orderId) =====
 var SHEET_ID = '';
 
-// ترتيب جدولك الحالي (A–M) كما هو، وعمودان جديدان بعد الحالة: N طريقة الدفع، O المدفوع الآن
+// ترتيب جدولك الحالي (A–M) كما هو، وعمودان جديدان بعد الحالة: N طريقة الدفع، O المدفوع الآن، P رقم الطلب
 var HEADERS = ['التاريخ','الاسم','الهاتف','الولاية','البلدية',
   'نوع التوصيل','شركة التوصيل','الدورة','الدورات','السعر','سعر التوصيل','المجموع','الحالة',
-  'طريقة الدفع','المدفوع الآن'];
+  'طريقة الدفع','المدفوع الآن','رقم الطلب'];
 
 function getSheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -61,7 +61,8 @@ function doPost(e) {
       p.product || '', p.items || '',
       Number(p.price) || 0, Number(p.shipping) || 0, Number(p.total) || 0,
       'طلب جديد',
-      p.paymentMethod || 'الدفع عند الاستلام', Number(p.paidNow) || 0
+      p.paymentMethod || 'الدفع عند الاستلام', Number(p.paidNow) || 0,
+      p.orderId || ''
     ]]);
 
     return ContentService.createTextOutput('ok');
@@ -74,11 +75,11 @@ function doGet() {
   return ContentService.createTextOutput('الخدمة تعمل');
 }
 
-// شغّل هذه الدالة مرة واحدة: تنظّف عمود "orderId" القديم وتكتب عنواني العمودين الجديدين (N و O)
+// شغّل هذه الدالة مرة واحدة: تنظّف عمود "orderId" القديم وتكتب عناوين الأعمدة الجديدة (N و O و P)
 function fixSheet() {
   var sh = getSheet_();
   removeOrderIdColumn_(sh);
-  if (sh.getLastRow() > 0) sh.getRange(1, 14, 1, 2).setValues([[HEADERS[13], HEADERS[14]]]);
+  if (sh.getLastRow() > 0) sh.getRange(1, 14, 1, 3).setValues([[HEADERS[13], HEADERS[14], HEADERS[15]]]);
 }
 
 // اختياري، مرة واحدة: يحذف الصفوف الفارغة (بدون اسم ولا هاتف) التي ظهرت سابقاً
@@ -96,6 +97,6 @@ function test() {
     wilaya: 'قسنطينة', commune: 'الخروب', delivery: 'للمنزل',
     deliveryCompany: 'DHD', product: 'حقيبة المهندس برو', items: 'Robot + AutoCAD',
     price: '7500', shipping: '700', total: '8200',
-    paymentMethod: 'الدفع عند الاستلام', paidNow: '0'
+    paymentMethod: 'الدفع عند الاستلام', paidNow: '0', orderId: 'HN-TEST'
   }});
 }
