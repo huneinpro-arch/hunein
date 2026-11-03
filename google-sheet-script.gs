@@ -3,7 +3,7 @@ var SHEET_ID = '';
 
 var HEADERS = ['التاريخ','الاسم','الهاتف','هاتف ثاني','الولاية','البلدية',
   'نوع التوصيل','شركة التوصيل','الدورة','السعر','سعر التوصيل','المجموع','الحالة',
-  'طريقة الدفع','المدفوع الآن','المتبقي عند الاستلام','الوصل','رقم الطلب'];
+  'طريقة الدفع','المدفوع الآن'];
 
 function getSheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -49,8 +49,7 @@ function doPost(e) {
       p.product || '',
       Number(p.price) || 0, Number(p.shipping) || 0, Number(p.total) || 0,
       'جديد',
-      p.paymentMethod || 'الدفع عند الاستلام', Number(p.paidNow) || 0, Number(p.dueOnDelivery) || 0,
-      p.receipt || '', p.orderId || ''
+      p.paymentMethod || 'الدفع عند الاستلام', Number(p.paidNow) || 0
     ]]);
 
     return ContentService.createTextOutput('ok');
@@ -76,7 +75,6 @@ function test() {
     wilaya: 'قسنطينة', commune: 'الخروب', delivery: 'للمنزل',
     deliveryCompany: 'DHD', product: 'حقيبة المهندس برو',
     price: '7500', shipping: '700', total: '8200',
-    paymentMethod: 'الدفع عند الاستلام', paidNow: '0', dueOnDelivery: '8200',
-    receipt: '', orderId: 'HN-TEST'
+    paymentMethod: 'الدفع عند الاستلام', paidNow: '0'
   }});
 }
