@@ -1,10 +1,10 @@
 // ===== طلبات حنين → Google Sheet (orderId) =====
 var SHEET_ID = '';
 
-// ترتيب جدولك الحالي (A–M) كما هو، وعمودان جديدان بعد الحالة: N طريقة الدفع، O المدفوع الآن، P رقم الطلب
-var HEADERS = ['التاريخ','الاسم','الهاتف','الولاية','البلدية',
+// A رقم الطلب (جديد في أول الجدول)، ثم ترتيب جدولك القديم B–N، ثم O طريقة الدفع، P المدفوع الآن
+var HEADERS = ['رقم الطلب','التاريخ','الاسم','الهاتف','الولاية','البلدية',
   'نوع التوصيل','شركة التوصيل','الدورة','الدورات','السعر','سعر التوصيل','المجموع','الحالة',
-  'طريقة الدفع','المدفوع الآن','رقم الطلب'];
+  'طريقة الدفع','المدفوع الآن'];
 
 function getSheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -51,8 +51,9 @@ function doPost(e) {
       prev.copyTo(sh.getRange(row, 1, 1, HEADERS.length), SpreadsheetApp.CopyPasteType.PASTE_DATA_VALIDATION, false);
     }
 
-    sh.getRange(row, 3).setNumberFormat('@');
+    sh.getRange(row, 4).setNumberFormat('@');
     sh.getRange(row, 1, 1, HEADERS.length).setValues([[
+      p.orderId || '',
       date,
       p.fullName || '',
       (p.phone || '') + (p.phone2 ? ' / ' + p.phone2 : ''),
@@ -61,8 +62,7 @@ function doPost(e) {
       p.product || '', p.items || '',
       Number(p.price) || 0, Number(p.shipping) || 0, Number(p.total) || 0,
       'طلب جديد',
-      p.paymentMethod || 'الدفع عند الاستلام', Number(p.paidNow) || 0,
-      p.orderId || ''
+      p.paymentMethod || 'الدفع عند الاستلام', Number(p.paidNow) || 0
     ]]);
 
     return ContentService.createTextOutput('ok');
@@ -75,18 +75,21 @@ function doGet() {
   return ContentService.createTextOutput('الخدمة تعمل');
 }
 
-// شغّل هذه الدالة مرة واحدة: تنظّف عمود "orderId" القديم وتكتب عناوين الأعمدة الجديدة (N و O و P)
+// شغّل هذه الدالة مرة واحدة: تضيف عمود "رقم الطلب" في أول الجدول (إن لم يكن موجوداً) وتكتب العناوين الجديدة
 function fixSheet() {
   var sh = getSheet_();
   removeOrderIdColumn_(sh);
-  if (sh.getLastRow() > 0) sh.getRange(1, 14, 1, 3).setValues([[HEADERS[13], HEADERS[14], HEADERS[15]]]);
+  if (sh.getLastRow() === 0) return;
+  if (sh.getRange(1, 1).getValue() !== HEADERS[0]) sh.insertColumnBefore(1);
+  sh.getRange(1, 1).setValue(HEADERS[0]);
+  sh.getRange(1, 15, 1, 2).setValues([[HEADERS[14], HEADERS[15]]]);
 }
 
 // اختياري، مرة واحدة: يحذف الصفوف الفارغة (بدون اسم ولا هاتف) التي ظهرت سابقاً
 function deleteEmptyRows() {
   var sh = getSheet_();
   for (var r = sh.getLastRow(); r >= 2; r--) {
-    var v = sh.getRange(r, 2, 1, 2).getValues()[0];
+    var v = sh.getRange(r, 3, 1, 2).getValues()[0];
     if (!v[0] && !v[1]) sh.deleteRow(r);
   }
 }
