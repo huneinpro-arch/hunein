@@ -662,7 +662,7 @@ $('f').addEventListener('submit',function(e){e.preventDefault();var er=$('er');e
   var c=co(),sh=rate(),tot=p.p+sh,dl=sel.t=='o'?'لمكتب التوصيل':'للمنزل',paid=cc?p.p:0,due=tot-paid;
   var ok_=oKey(nm,ph,p.ids.join('+')),bl=oCheck(ok_);if(bl>0)return er.textContent=oMsg(bl);
   var oid=genId();
-  var data={orderId:oid,items:p.items.join(' + '),fullName:nm,phone:ph,phone2:ph2,wilaya:W[sel.w-1],commune:cmv,delivery:dl,product:p.val,price:String(cc?0:p.p),deliveryCompany:c.n,shipping:String(sh),total:String(cc?sh:tot),
+  var data={orderId:oid,items:p.items.join(' + '),fullName:nm,phone:ph,phone2:ph2,wilaya:W[sel.w-1],commune:cmv,delivery:dl,product:p.val,qty:String(p.ids.length),basePrice:String(p.sep||p.p),price:String(cc?0:p.p),deliveryCompany:c.n,shipping:String(sh),total:String(cc?sh:tot),
     paymentMethod:cc?'بريدي موب / CCP':'الدفع عند الاستلام',paidNow:String(paid),dueOnDelivery:String(due),receipt:cc?'أُرسل عبر واتساب':''};
   var sb=$('sb');sb.disabled=true;sb.textContent='جارٍ تسجيل الطلب...';
   function fin(rcOk){oBump(ok_);fire(C.PX_EVENT||'Purchase',{value:tot,currency:'DZD',content_ids:p.ids,content_name:p.n,content_type:'product',num_items:p.ids.length},{name:nm,phone:ph,wilaya:W[sel.w-1],commune:cmv});$('f').style.display='none';$('done').style.display='block';
