@@ -1,8 +1,9 @@
 // ===== طلبات حنين → Google Sheet (orderId) =====
 var SHEET_ID = '';
 
-var HEADERS = ['التاريخ','الاسم','الهاتف','هاتف ثاني','الولاية','البلدية',
-  'نوع التوصيل','شركة التوصيل','الدورة','السعر','سعر التوصيل','المجموع','الحالة',
+// ترتيب جدولك الحالي (A–M) كما هو، وعمودان جديدان بعد الحالة: N طريقة الدفع، O المدفوع الآن
+var HEADERS = ['التاريخ','الاسم','الهاتف','الولاية','البلدية',
+  'نوع التوصيل','شركة التوصيل','الدورة','الدورات','السعر','سعر التوصيل','المجموع','الحالة',
   'طريقة الدفع','المدفوع الآن'];
 
 function getSheet_() {
@@ -28,6 +29,9 @@ function doPost(e) {
   lock.waitLock(20000);
   try {
     var p = (e && e.parameter) || {};
+    // يتجاهل أي طلب فارغ (بدون اسم ولا هاتف) حتى لا تظهر صفوف فارغة
+    if (!p.fullName && !p.phone) return ContentService.createTextOutput('empty');
+
     var sh = getSheet_();
 
     removeOrderIdColumn_(sh);
@@ -40,15 +44,23 @@ function doPost(e) {
     var row = sh.getLastRow() + 1;
     var date = Utilities.formatDate(new Date(), 'Africa/Algiers', 'yyyy-MM-dd HH:mm');
 
-    sh.getRange(row, 3, 1, 2).setNumberFormat('@');
+    // ينسخ تنسيق وقائمة "الحالة" من الصف السابق ليبقى الجدول متناسقاً
+    if (row > 2) {
+      var prev = sh.getRange(row - 1, 1, 1, HEADERS.length);
+      prev.copyTo(sh.getRange(row, 1, 1, HEADERS.length), SpreadsheetApp.CopyPasteType.PASTE_FORMAT, false);
+      prev.copyTo(sh.getRange(row, 1, 1, HEADERS.length), SpreadsheetApp.CopyPasteType.PASTE_DATA_VALIDATION, false);
+    }
+
+    sh.getRange(row, 3).setNumberFormat('@');
     sh.getRange(row, 1, 1, HEADERS.length).setValues([[
       date,
-      p.fullName || '', p.phone || '', p.phone2 || '',
+      p.fullName || '',
+      (p.phone || '') + (p.phone2 ? ' / ' + p.phone2 : ''),
       p.wilaya || '', p.commune || '',
       p.delivery || '', p.deliveryCompany || '',
-      p.product || '',
+      p.product || '', p.items || '',
       Number(p.price) || 0, Number(p.shipping) || 0, Number(p.total) || 0,
-      'جديد',
+      'طلب جديد',
       p.paymentMethod || 'الدفع عند الاستلام', Number(p.paidNow) || 0
     ]]);
 
@@ -62,18 +74,27 @@ function doGet() {
   return ContentService.createTextOutput('الخدمة تعمل');
 }
 
-// شغّل هذه الدالة مرة واحدة: تنظّف الجدول القديم من عمود "orderId" وتكتب عناوين الأعمدة الجديدة
+// شغّل هذه الدالة مرة واحدة: تنظّف عمود "orderId" القديم وتكتب عنواني العمودين الجديدين (N و O)
 function fixSheet() {
   var sh = getSheet_();
   removeOrderIdColumn_(sh);
-  if (sh.getLastRow() > 0) sh.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+  if (sh.getLastRow() > 0) sh.getRange(1, 14, 1, 2).setValues([[HEADERS[13], HEADERS[14]]]);
+}
+
+// اختياري، مرة واحدة: يحذف الصفوف الفارغة (بدون اسم ولا هاتف) التي ظهرت سابقاً
+function deleteEmptyRows() {
+  var sh = getSheet_();
+  for (var r = sh.getLastRow(); r >= 2; r--) {
+    var v = sh.getRange(r, 2, 1, 2).getValues()[0];
+    if (!v[0] && !v[1]) sh.deleteRow(r);
+  }
 }
 
 function test() {
   doPost({ parameter: {
     fullName: 'طلب تجريبي', phone: '0550123456', phone2: '',
     wilaya: 'قسنطينة', commune: 'الخروب', delivery: 'للمنزل',
-    deliveryCompany: 'DHD', product: 'حقيبة المهندس برو',
+    deliveryCompany: 'DHD', product: 'حقيبة المهندس برو', items: 'Robot + AutoCAD',
     price: '7500', shipping: '700', total: '8200',
     paymentMethod: 'الدفع عند الاستلام', paidNow: '0'
   }});
