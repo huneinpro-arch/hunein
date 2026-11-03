@@ -39,7 +39,8 @@ function fields_(p, date, hasOffer) {
     'totalprix': Number(p.total) || 0, 'total': Number(p.total) || 0, 'المجموع': Number(p.total) || 0,
     'status': 'طلب جديد', 'الحالة': 'طلب جديد',
     'طريقةالدفع': p.paymentMethod || 'الدفع عند الاستلام', 'paymentmethod': p.paymentMethod || 'الدفع عند الاستلام',
-    'المدفوعالآن': Number(p.paidNow) || 0, 'paidnow': Number(p.paidNow) || 0
+    'المدفوعالآن': Number(p.paidNow) || 0, 'paidnow': Number(p.paidNow) || 0,
+    'الوصل': p.receipt || '', 'receipt': p.receipt || ''
   };
   return f;
 }
@@ -57,6 +58,11 @@ function doPost(e) {
     if (sh.getLastRow() === 0 || cols === 0) throw new Error('اكتب عناوين الأعمدة في الصف الأول من الجدول');
 
     var heads = sh.getRange(1, 1, 1, cols).getValues()[0].map(norm_);
+    // عمود بلا عنوان: بعد product يأخذ أسماء الدورات، وبعد total Prix يأخذ الحالة
+    for (var k = 1; k < heads.length; k++) {
+      if (heads[k] === '' && (heads[k - 1] === 'product' || heads[k - 1] === 'الدورة')) heads[k] = 'items';
+      if (heads[k] === '' && (heads[k - 1] === 'totalprix' || heads[k - 1] === 'total' || heads[k - 1] === 'المجموع')) heads[k] = 'status';
+    }
     var hasOffer = heads.indexOf('offerprice') > -1;
     var date = Utilities.formatDate(new Date(), 'Africa/Algiers', 'yyyy-MM-dd HH:mm');
     var f = fields_(p, date, hasOffer);
@@ -90,6 +96,6 @@ function test() {
     wilaya: 'قسنطينة', commune: 'الخروب', delivery: 'للمنزل',
     deliveryCompany: 'DHD', product: 'حقيبة المهندس برو', items: 'Robot + AutoCAD', qty: '3',
     basePrice: '15000', price: '7500', shipping: '700', total: '8200',
-    paymentMethod: 'الدفع عند الاستلام', paidNow: '0'
+    paymentMethod: 'الدفع عند الاستلام', paidNow: '0', receipt: ''
   }});
 }
