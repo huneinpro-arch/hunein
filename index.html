@@ -176,7 +176,8 @@ form{padding:24px 28px 30px}
 .tier b{color:#fff}.tier s{color:#7f90bf}
 .up{margin-top:10px;position:relative;background:linear-gradient(135deg,rgba(255,194,26,.16),rgba(255,194,26,.05));border:2px solid var(--am);border-radius:16px;padding:22px 14px 12px;color:#ffefbd;font-weight:600;line-height:1.8;animation:upg 2.2s ease-in-out infinite}
 .up .ut{position:absolute;top:-12px;inset-inline-end:12px;background:linear-gradient(135deg,var(--am),#ffa800);color:#2a1a00;font-weight:900;font-size:12.5px;padding:2px 12px;border-radius:99px}
-.up b{color:var(--am2)}.up em{display:block;font-style:normal;margin-top:6px;background:var(--gr);color:#04230f;border-radius:99px;padding:6px 10px;font-weight:900;font-size:16px;text-align:center}
+.up b{color:var(--am2)}.upp{display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:0 8px;margin:10px 0 4px;text-align:center;font-weight:700}.upp strong{font-size:clamp(26px,8vw,34px);font-weight:900;color:var(--gr);line-height:1.1;margin-inline:4px;white-space:nowrap}.upp s{font-size:16px;color:#9fb0d6;white-space:nowrap}
+.up em,.tier em{display:block;width:fit-content;margin:6px auto 0;font-style:normal;background:var(--gr);color:#04230f;border-radius:99px;padding:3px 14px;font-weight:800;font-size:13px;text-align:center}
 @keyframes upg{50%{box-shadow:0 0 0 5px rgba(255,194,26,.16)}}.tier.ok{background:rgba(57,238,107,.08);border:1.5px solid rgba(57,238,107,.5);color:#d4ffe2}.tier.ok b{color:var(--gr)}.tier small{display:block;margin-top:4px;color:var(--bl2);font-weight:700;font-size:13.5px}
 .note{font-size:13.5px;color:var(--am2);background:rgba(255,194,26,.1);border:1px solid rgba(255,194,26,.3);border-radius:12px;padding:8px 12px;margin-top:10px}
 .note:empty{display:none}
@@ -584,10 +585,10 @@ function cm(){var s=$('cm'),tx=$('cmt'),nt=$('nt'),list=lst();
 /* شريط الحقيبة: يبيّن الحقيبة الحالية والدورة التالية التي تفتح حقيبة أكبر */
 function tr(){var n=sel.cs.length,t=tier(n),nx=tier(n+1),p=cur(),h='',up='';
  /* عرض الإغراء: كم تكلف الدورة الإضافية فعلاً، وكم يربح الزبون في جيبه */
- if(n&&nx){var sep=(n+1)*5000;up='<div class="up"><span class="ut">🔥 عرض خاص لك</span>أضف '+['','دورة ثانية','دورة ثالثة','الدورة الرابعة'][n]+' بـ <b>'+m(nx.p-p.p)+' فقط</b> بدل '+m(5000)+'، وتأخذ <b>'+nx.n+' '+'⭐'.repeat(nx.st)+'</b> بـ '+m(nx.p)+' بدل <s>'+m(sep)+'</s><em>💰 تربح '+m(sep-nx.p)+' في جيبك!</em></div>'}
+ if(n&&nx){var sep=(n+1)*5000;up='<div class="up"><span class="ut">🔥 عرض خاص لك</span>أضف '+['','دورة ثانية','دورة ثالثة','الدورة الرابعة'][n]+' بـ <b>'+m(nx.p-p.p)+' فقط</b> بدل '+m(5000)+'، وتأخذ <b>'+nx.n+' '+'⭐'.repeat(nx.st)+'</b><span class="upp">بـ <strong>'+m(nx.p)+'</strong> بدل <s>'+m(sep)+'</s></span><em>💰 تربح '+m(sep-nx.p)+' في جيبك!</em></div>'}
  if(!n)h='👆 اختر الدورات اللي تحبها: <b>دورتان</b> = حقيبة المهندس ('+m(tier(2).p)+')، <b>3 دورات</b> = حقيبة المهندس برو ('+m(tier(3).p)+')، <b>الدورات الأربع</b> = حقيبة المهندس PROMAX ('+m(tier(4).p)+').';
  else if(n==1)h='اخترت دورة واحدة: <b>'+m(p.p)+'</b>'+up;
- else h='🎁 مبروك! اخترت '+n+' دورات = <b>'+t.n+' '+'⭐'.repeat(t.st)+'</b> بـ <b>'+m(t.p)+'</b> بدل <s>'+m(p.sep)+'</s> — <b>ربحت '+m(p.sep-t.p)+' في جيبك</b>'+up;
+ else h='🎁 مبروك! اخترت '+n+' دورات = <b>'+t.n+' '+'⭐'.repeat(t.st)+'</b><span class="upp">بـ <strong>'+m(t.p)+'</strong> بدل <s>'+m(p.sep)+'</s></span><em>ربحت '+m(p.sep-t.p)+' في جيبك</em>'+up;
  $('tr').className='tier'+(n>1?' ok':'');$('tr').innerHTML=h}
 function sum(){var p=cur(),sh=rate(),cc=sel.pay=='ccp';$('sp').textContent=p?p.n:'—';$('sq').textContent=p?m(p.p):'—';$('sl').textContent='سعر التوصيل ('+co().n+(sel.t=='o'?' · مكتب':' · منزل')+')';$('ss').textContent=m(sh);$('st').textContent=p?m(p.p+sh):'—';
   $('sq').parentNode.style.display=cc?'none':'';$('st').parentNode.style.display=cc?'none':'';$('sx1').className='x';$('sx2').className='x';$('sn').textContent=p?m(p.p):'—';$('sd').textContent=sh>0?m(sh):'—';
