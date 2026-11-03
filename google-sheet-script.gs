@@ -1,7 +1,6 @@
 // ===== طلبات حنين → Google Sheet (orderId) =====
 var SHEET_ID = '';
 
-// الأعمدة القديمة كما هي (1-13). الأعمدة الجديدة أُضيفت في النهاية حتى لا يتغير ترتيب جدولك الحالي.
 var HEADERS = ['التاريخ','الاسم','الهاتف','هاتف ثاني','الولاية','البلدية',
   'نوع التوصيل','شركة التوصيل','الدورة','السعر','سعر التوصيل','المجموع','الحالة',
   'طريقة الدفع','المدفوع الآن','المتبقي عند الاستلام','الوصل','رقم الطلب'];
@@ -24,15 +23,6 @@ function removeOrderIdColumn_(sh) {
   if (i > -1) sh.deleteColumn(i + 1);
 }
 
-// يكتب عناوين الأعمدة الجديدة (14-18) إن لم تكن موجودة في جدول قديم
-function ensureHeaders_(sh) {
-  var n = HEADERS.length;
-  var cur = sh.getRange(1, 1, 1, n).getValues()[0];
-  for (var i = 13; i < n; i++) {
-    if (!cur[i]) sh.getRange(1, i + 1).setValue(HEADERS[i]);
-  }
-}
-
 function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.waitLock(20000);
@@ -45,8 +35,6 @@ function doPost(e) {
     if (sh.getLastRow() === 0) {
       sh.appendRow(HEADERS);
       sh.setFrozenRows(1);
-    } else {
-      ensureHeaders_(sh);
     }
 
     var row = sh.getLastRow() + 1;
@@ -61,10 +49,8 @@ function doPost(e) {
       p.product || '',
       Number(p.price) || 0, Number(p.shipping) || 0, Number(p.total) || 0,
       'جديد',
-      p.paymentMethod || 'الدفع عند الاستلام',
-      Number(p.paidNow) || 0, Number(p.dueOnDelivery) || 0,
-      p.receipt || '',
-      p.orderId || ''
+      p.paymentMethod || 'الدفع عند الاستلام', Number(p.paidNow) || 0, Number(p.dueOnDelivery) || 0,
+      p.receipt || '', p.orderId || ''
     ]]);
 
     return ContentService.createTextOutput('ok');
@@ -77,10 +63,11 @@ function doGet() {
   return ContentService.createTextOutput('الخدمة تعمل');
 }
 
-// شغّل هذه الدالة مرة واحدة: تنظّف الجدول القديم من عمود "orderId" فوراً
+// شغّل هذه الدالة مرة واحدة: تنظّف الجدول القديم من عمود "orderId" وتكتب عناوين الأعمدة الجديدة
 function fixSheet() {
-  removeOrderIdColumn_(getSheet_());
-  ensureHeaders_(getSheet_());
+  var sh = getSheet_();
+  removeOrderIdColumn_(sh);
+  if (sh.getLastRow() > 0) sh.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
 }
 
 function test() {
@@ -88,8 +75,8 @@ function test() {
     fullName: 'طلب تجريبي', phone: '0550123456', phone2: '',
     wilaya: 'قسنطينة', commune: 'الخروب', delivery: 'للمنزل',
     deliveryCompany: 'DHD', product: 'حقيبة المهندس برو',
-    price: '0', shipping: '700', total: '700',
-    paymentMethod: 'بريدي موب / CCP', paidNow: '7500', dueOnDelivery: '700',
-    receipt: 'أُرسل عبر واتساب', orderId: 'HN-TEST'
+    price: '7500', shipping: '700', total: '8200',
+    paymentMethod: 'الدفع عند الاستلام', paidNow: '0', dueOnDelivery: '8200',
+    receipt: '', orderId: 'HN-TEST'
   }});
 }
