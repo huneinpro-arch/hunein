@@ -612,7 +612,7 @@ function cm(){var s=$('cm'),tx=$('cmt'),nt=$('nt'),keep=s.value;
  if(keep&&[].some.call(s.options,function(o){return o.value==keep}))s.value=keep;
  s.onchange=function(){tx.style.display=s.value=='__o'?'':'none';if(s.value=='__o')tx.focus()};
  tx.style.display=s.value=='__o'?'':'none';
- nt.textContent=home?'اختر بلديتك. إن لم تجدها في القائمة اختر «بلدية أخرى» واكتب اسمها بالفرنسية.':'📍 تظهر هنا البلديات التي بها مكاتب '+co().n+' في هذه الولاية.'}
+ nt.textContent=home?'اختر بلديتك':'📍 تظهر هنا البلديات التي بها مكاتب '+co().n+' في هذه الولاية.'}
 /* شريط الحقيبة: يبيّن الحقيبة الحالية والدورة التالية التي تفتح حقيبة أكبر */
 function tr(){var n=sel.cs.length,t=tier(n),nx=tier(n+1),p=cur(),h='',up='';
  /* عرض الإغراء: كم تكلف الدورة الإضافية فعلاً، وكم يربح الزبون في جيبه */
@@ -897,7 +897,7 @@ var D=[
 ["الرجاء التسجيل برقم الواتساب أفضل حتى يتسنى لنا مراسلتكم أو التواصل معكم.","Merci d’indiquer de préférence votre numéro WhatsApp afin que nous puissions vous écrire ou vous contacter.","Please enter your WhatsApp number if possible so we can message or contact you."],
 ["رقم الهاتف (واتساب)","Numéro de téléphone (WhatsApp)","Phone number (WhatsApp)"],
 ["بلدية أخرى (اكتبها بالفرنسية)","Autre commune (à écrire en français)","Other commune (write it in French)"],
-["اختر بلديتك. إن لم تجدها في القائمة اختر «بلدية أخرى» واكتب اسمها بالفرنسية.","Choisissez votre commune. Si elle n’apparaît pas, choisissez « Autre commune » et écrivez son nom en français.","Choose your commune. If it is not listed, choose “Other commune” and type its name in French."],
+["اختر بلديتك","Choisissez votre commune","Choose your commune"],
 ["📍 تظهر هنا البلديات التي بها مكاتب {0} في هذه الولاية.","📍 Seules les communes disposant d’un bureau {0} dans cette wilaya sont affichées.","📍 Only communes with a {0} office in this wilaya are shown."],
 ["اكتب اسم بلديتك بالفرنسية (Ex : Bab Ezzouar)","Écrivez le nom de votre commune (Ex : Bab Ezzouar)","Type your commune name in French (Ex: Bab Ezzouar)"]
 ];
