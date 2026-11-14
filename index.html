@@ -6,7 +6,7 @@
 <title>حقيبة المهندس | حنين Hunein — دورات الهندسة المدنية مسجلة في فلاشة</title>
 <meta name="description" content="Robot Structural Analysis، AutoCAD Structural Detailing، Charpente Métallique، AutoCAD —دورات تطبيقية مسجلة في فلاشة، من إعداد الأستاذ أمين بنقالة. توصيل لكل الولايات.">
 <meta name="theme-color" content="#050c29">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://script.google.com"><link rel="preconnect" href="https://script.googleusercontent.com"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 <style>
 :root{--bg:#050c29;--bg2:#09153a;--bg3:#0f2150;--bl:#3b8cff;--bl2:#8dbbff;--gr:#39ee6b;--gr2:#1fd37a;--am:#ffc21a;--am2:#ffe08a;--tx:#eef3ff;--mut:#a3b3d9;--ln:rgba(110,150,255,.2);--ok:#25d366;--bad:#ff8080;box-sizing:border-box}
@@ -706,6 +706,9 @@ var TH={
 };
 var cfRaf=0,thxLast=null;
 function thxLang(){var l=document.documentElement.lang;return l=='fr'||l=='en'?l:'ar'}
+function rcFbHide(){$('rcfb').className='rcfb';$('rcs').style.display='none'}
+function rcFbShow(o){var fb=$('rcfb');fb.className='rcfb on';$('rcw').href='https://wa.me/'+C.WA+'?text='+encodeURIComponent('السلام عليكم، هذا وصل دفع طلبي رقم '+o.oid+' ('+o.nm+' — '+m(o.paid)+'). سأرفقه الآن.');
+  try{var fl=new File([Uint8Array.from(atob(RC.b64),function(ch){return ch.charCodeAt(0)})],RC.name,{type:RC.mime});if(navigator.canShare&&navigator.canShare({files:[fl]})){var sbn=$('rcs');sbn.style.display='';sbn.onclick=function(){navigator.share({files:[fl],text:'وصل دفع الطلب '+o.oid}).catch(function(){})}}}catch(x){}}
 function thxOpen(o){var L=thxLang(),T=TH[L],P=function(v){var s=m(v);return L=='ar'?s:s.replace(/دج/g,'DA')};
  thxLast=o;
  $('thxh').textContent=T.t;$('thxs').textContent=T.s;$('oidl').textContent=T.no;$('oid').textContent='#'+o.oid;$('cpy').textContent=T.cp;
@@ -717,9 +720,7 @@ function thxOpen(o){var L=thxLang(),T=TH[L],P=function(v){var s=m(v);return L=='
  $('thxsum').innerHTML=h;
  $('thxo').textContent=T.opt;$('walt').textContent=T.wa;$('thxb').textContent=T.bk;
  $('wal').href='https://wa.me/'+C.WA+'?text='+encodeURIComponent(T.msg(o,P(o.tot)));
- var fb=$('rcfb');fb.className='rcfb';$('rcs').style.display='none';
- if(o.cc&&!o.rcOk){fb.className='rcfb on';$('rcw').href='https://wa.me/'+C.WA+'?text='+encodeURIComponent('السلام عليكم، هذا وصل دفع طلبي رقم '+o.oid+' ('+o.nm+' — '+m(o.paid)+'). سأرفقه الآن.');
-  try{var fl=new File([Uint8Array.from(atob(RC.b64),function(ch){return ch.charCodeAt(0)})],RC.name,{type:RC.mime});if(navigator.canShare&&navigator.canShare({files:[fl]})){var sbn=$('rcs');sbn.style.display='';sbn.onclick=function(){navigator.share({files:[fl],text:'وصل دفع الطلب '+o.oid}).catch(function(){})}}}catch(x){}}
+ rcFbHide();if(o.cc&&!o.rcOk)rcFbShow(o);
  $('cpy').onclick=function(){var b=this,v=$('oid').textContent;function ok(){b.textContent=T.cd;setTimeout(function(){b.textContent=T.cp},1800)}
   function fb2(){var a=document.createElement('textarea');a.value=v;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(a);ok()}
   try{navigator.clipboard.writeText(v).then(ok,fb2)}catch(e){fb2()}};
@@ -728,7 +729,7 @@ function thxOpen(o){var L=thxLang(),T=TH[L],P=function(v){var s=m(v);return L=='
  cfStart()}
 function thxReset(){$('f').reset();sel.cs=[];sel.w='';sel.c='dhd';sel.pc='dhd';sel.t='h';sel.pay='cod';
  RC=null;rcBusy=0;$('rf').value='';rcShow();$('er').textContent='';icx=0;$('sb').disabled=false;draw()}
-function thxClose(){$('thx').classList.remove('on');document.body.style.overflow='';cfStop();thxReset();window.scrollTo({top:0,behavior:'instant'})}
+function thxClose(){[].slice.call(document.querySelectorAll('.syncw')).forEach(function(e){e.remove()});$('thx').classList.remove('on');document.body.style.overflow='';cfStop();thxReset();window.scrollTo({top:0,behavior:'instant'})}
 $('thxb').addEventListener('click',thxClose);
 document.addEventListener('keydown',function(e){if(e.key=='Escape'&&$('thx').classList.contains('on'))thxClose()});
 /* كونفيتي (canvas) */
@@ -752,6 +753,20 @@ function cfStart(){cfStop();var cv=$('cf'),cx=cv.getContext('2d');if(!cx)return;
    cx.restore()}
   if(P.length&&el<14000)cfRaf=requestAnimationFrame(frame);else cfStop()}
  cfRaf=requestAnimationFrame(frame)}
+/* ===== إرسال الطلب إلى الجدول: طابور محلي + إعادة محاولة (لا يضيع طلب عند انقطاع الشبكة) ===== */
+var Q_KEY='hn_q';
+function qLoad(){try{return JSON.parse(localStorage.getItem(Q_KEY)||'[]').filter(function(x){return x&&x.d&&Date.now()-x.t<2*864e5})}catch(e){return[]}}
+function qSave(a){try{localStorage.setItem(Q_KEY,JSON.stringify(a))}catch(e){}}
+function qAdd(d){var a=qLoad();a.push({d:d,t:Date.now()});qSave(a)}
+function qDel(id){qSave(qLoad().filter(function(x){return x.d.orderId!==id}))}
+function sendOrder(d){try{return fetch(C.SHEET,{method:'POST',mode:'no-cors',keepalive:true,body:new URLSearchParams(d)}).then(function(){return true},function(){return false})}catch(x){return Promise.resolve(false)}}
+function sendRetry(d,n){return sendOrder(d).then(function(ok){if(ok||n<=0)return ok;return new Promise(function(r){setTimeout(r,[800,2500,6000][3-n]||6000)}).then(function(){return sendRetry(d,n-1)})})}
+function qFlush(){var a=qLoad();qSave([]);a.forEach(function(x){sendRetry(x.d,1).then(function(ok){if(!ok){var q=qLoad();q.push(x);qSave(q)}})})}
+addEventListener('online',qFlush);setTimeout(qFlush,4000);
+function syncWarn(oid,nm){var L=thxLang(),S={ar:'تعذّر تسجيل طلبك تلقائياً بسبب ضعف الاتصال. اضغط لإرساله لنا عبر واتساب:',fr:'Votre commande n’a pas pu être enregistrée automatiquement (connexion faible). Envoyez-la-nous sur WhatsApp :',en:'We could not save your order automatically (weak connection). Send it to us on WhatsApp:'};
+ if(!$('thx').classList.contains('on'))return;
+ var d=document.createElement('div');d.className='rcfb on syncw';d.innerHTML='<b>⚠️ '+esc(S[L])+'</b><div class="act"><a class="btn bw" target="_blank" rel="noopener" href="https://wa.me/'+C.WA+'?text='+encodeURIComponent('السلام عليكم، أنا '+nm+'، طلبي رقم '+oid+' ولم يُسجَّل تلقائياً على الموقع.')+'">💬 WhatsApp</a></div>';
+ var t=$('thxsum');if(t&&t.parentNode)t.parentNode.insertBefore(d,t.nextSibling)}
 $('f').addEventListener('submit',function(e){e.preventDefault();var er=$('er');er.textContent='';
   var nm=$('nm').value.trim(),ph=$('ph').value.replace(/[\s.-]/g,''),cmv=$('cm').value=='__o'?$('cmt').value.trim():$('cm').value;
   var p=cur();if(!p)return er.textContent='اختر دورة واحدة على الأقل.';
@@ -768,13 +783,15 @@ $('f').addEventListener('submit',function(e){e.preventDefault();var er=$('er');e
   var oid=genId();
   var data={orderId:oid,items:p.items.join(' + '),fullName:nm,phone:ph,phone2:'',wilaya:W[sel.w-1],commune:cmv,delivery:dl,product:p.val,qty:String(p.ids.length),basePrice:String(p.sep||p.p),price:String(cc?0:p.p),deliveryCompany:c.n,shipping:String(sh),total:String(cc?sh:tot),
     paymentMethod:cc?'بريدي موب / CCP':'الدفع عند الاستلام',paidNow:String(paid),dueOnDelivery:String(due),receipt:cc?'أُرسل عبر واتساب':''};
-  var sb=$('sb');sb.disabled=true;sb.textContent='جارٍ تسجيل الطلب...';
-  function fin(rcOk){oBump(ok_);fire(C.PX_EVENT||'Purchase',{value:tot,currency:'DZD',content_ids:p.ids,content_name:p.n,content_type:'product',num_items:p.ids.length},{name:nm,phone:ph,wilaya:W[sel.w-1],commune:cmv});
-   thxOpen({oid:oid,nm:nm,n:p.ids.length,t:sel.t,co:c.n,w:sel.w,cm:cmv,tot:tot,paid:paid,due:due,cc:cc,rcOk:rcOk,pn:p.n})}
-  function fail(){sb.disabled=false;sum();er.textContent='تعذر إرسال الطلب. حاول مجدداً أو تواصل معنا عبر واتساب حنين '+C.WA_SHOW+'.'}
-  var sheetP,rcP=cc?sendRc({id:oid,nm:nm,ph:ph,course:p.val,amount:p.p,due:due,w:W[sel.w-1]}):Promise.resolve(true);
-  try{sheetP=fetch(C.SHEET,{method:'POST',mode:'no-cors',body:new URLSearchParams(data)}).then(function(){return true},function(){return false})}catch(x){sheetP=Promise.resolve(false)}
-  Promise.all([sheetP,rcP]).then(function(r){r[0]?fin(r[1]):fail()})});
+  var sb=$('sb');sb.disabled=true;
+  /* فوري: تُعرض صفحة الشكر بمجرد النقر، ويُسجَّل الطلب في الخلفية مع إعادة محاولة تلقائية */
+  oBump(ok_);
+  fire(C.PX_EVENT||'Purchase',{value:tot,currency:'DZD',content_ids:p.ids,content_name:p.n,content_type:'product',num_items:p.ids.length},{name:nm,phone:ph,wilaya:W[sel.w-1],commune:cmv});
+  thxOpen({oid:oid,nm:nm,n:p.ids.length,t:sel.t,co:c.n,w:sel.w,cm:cmv,tot:tot,paid:paid,due:due,cc:cc,rcOk:true,pn:p.n});
+  var rcP=cc?sendRc({id:oid,nm:nm,ph:ph,course:p.val,amount:p.p,due:due,w:W[sel.w-1]}):null;
+  qAdd(data);
+  sendRetry(data,3).then(function(ok){if(ok)qDel(oid);else syncWarn(oid,nm)});
+  if(rcP)rcP.then(function(ok){if(!ok&&$('thx').classList.contains('on')&&thxLast){thxLast.rcOk=false;rcFbShow(thxLast)}})});
 draw();
 if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target)}})},{threshold:.12});document.querySelectorAll('.rv').forEach(function(el){io.observe(el)})}else{document.querySelectorAll('.rv').forEach(function(el){el.classList.add('in')})}
 window.__ok=1;

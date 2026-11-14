@@ -126,6 +126,9 @@ function doPost(e) {
     // يرفض أي طلب غير صالح قبل أن يلمس الجدول
     var p = validate_(raw);
     if (!p) return ContentService.createTextOutput('invalid');
+    // يمنع التكرار: الموقع قد يعيد إرسال الطلب نفسه عند ضعف الشبكة (نفس رقم الطلب يُسجَّل مرة واحدة)
+    var cache = CacheService.getScriptCache();
+    if (cache.get('o_' + p.orderId)) return ContentService.createTextOutput('dup');
 
     var sh = getSheet_();
     if (sh.getLastRow() === 0 || sh.getLastColumn() === 0) throw new Error('اكتب عناوين الأعمدة في الصف الأول من الجدول');
@@ -160,6 +163,7 @@ function doPost(e) {
       }
     }
     sh.getRange(row, 1, 1, cols).setValues([vals]);
+    cache.put('o_' + p.orderId, '1', 21600);
 
     return ContentService.createTextOutput('ok');
   } finally {
