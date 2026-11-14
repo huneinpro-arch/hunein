@@ -66,13 +66,66 @@ function ensureNamePhone_(sh) {
   }
 }
 
+// ===== التحقق في الخادم (لا نثق بما يرسله المتصفح) =====
+var PHONE_RE_ = /^0[567]\d{8}$/;
+var ORDER_RE_ = /^HN-\d{6}-[A-Z2-9]{4}$/;
+var DELIVERY_OK_ = ['للمنزل', 'لمكتب التوصيل'];
+var PAYMENT_OK_ = ['الدفع عند الاستلام', 'بريدي موب / CCP'];
+var RISKY_RE_ = /^[=+\-@\t\r]/; // نص يبدأ بهذه الرموز قد يُفسَّر كصيغة في الجدول
+
+// يزيل محارف التحكم ويقصّ الطول
+function txt_(v, max) {
+  return String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
+}
+
+// رقم بين 0 وحدّ أعلى معقول، وإلا 0
+function num_(v, max) {
+  var n = Number(v);
+  return isFinite(n) && n >= 0 && n <= max ? n : 0;
+}
+
+// يعيد نسخة منظّفة من الطلب، أو null إن كان غير صالح
+function validate_(raw) {
+  var p = {
+    orderId: txt_(raw.orderId, 20),
+    fullName: txt_(raw.fullName, 80),
+    phone: txt_(raw.phone, 10),
+    phone2: txt_(raw.phone2, 10),
+    wilaya: txt_(raw.wilaya, 40),
+    commune: txt_(raw.commune, 60),
+    delivery: txt_(raw.delivery, 30),
+    deliveryCompany: txt_(raw.deliveryCompany, 30),
+    product: txt_(raw.product, 120),
+    items: txt_(raw.items, 250),
+    qty: Math.min(Math.max(Math.floor(num_(raw.qty, 20)), 1), 20),
+    basePrice: num_(raw.basePrice, 1000000),
+    price: num_(raw.price, 1000000),
+    shipping: num_(raw.shipping, 20000),
+    total: num_(raw.total, 1000000),
+    paidNow: num_(raw.paidNow, 1000000),
+    paymentMethod: txt_(raw.paymentMethod, 30) || 'الدفع عند الاستلام',
+    receipt: txt_(raw.receipt, 40)
+  };
+  if (!ORDER_RE_.test(p.orderId)) return null;
+  if (p.fullName.length < 3) return null;
+  if (!PHONE_RE_.test(p.phone)) return null;
+  if (p.phone2 && !PHONE_RE_.test(p.phone2)) return null;
+  if (!p.wilaya || !p.commune) return null;
+  if (DELIVERY_OK_.indexOf(p.delivery) < 0) return null;
+  if (PAYMENT_OK_.indexOf(p.paymentMethod) < 0) return null;
+  return p;
+}
+
 function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.waitLock(20000);
   try {
-    var p = (e && e.parameter) || {};
+    var raw = (e && e.parameter) || {};
     // يتجاهل أي طلب فارغ (بدون اسم ولا هاتف)
-    if (!p.fullName && !p.phone) return ContentService.createTextOutput('empty');
+    if (!raw.fullName && !raw.phone) return ContentService.createTextOutput('empty');
+    // يرفض أي طلب غير صالح قبل أن يلمس الجدول
+    var p = validate_(raw);
+    if (!p) return ContentService.createTextOutput('invalid');
 
     var sh = getSheet_();
     if (sh.getLastRow() === 0 || sh.getLastColumn() === 0) throw new Error('اكتب عناوين الأعمدة في الصف الأول من الجدول');
@@ -100,6 +153,12 @@ function doPost(e) {
     if (phoneCol > -1) sh.getRange(row, phoneCol + 1).setNumberFormat('@');
 
     var vals = heads.map(function (h) { return f.hasOwnProperty(h) ? f[h] : ''; });
+    // أي خلية نصية تبدأ برمز صيغة (= + - @) تُحفظ كنص عادي حتى لا تُنفَّذ كصيغة
+    for (var c = 0; c < vals.length; c++) {
+      if (typeof vals[c] === 'string' && RISKY_RE_.test(vals[c])) {
+        sh.getRange(row, c + 1).setNumberFormat('@');
+      }
+    }
     sh.getRange(row, 1, 1, cols).setValues([vals]);
 
     return ContentService.createTextOutput('ok');
@@ -114,7 +173,7 @@ function doGet() {
 
 function test() {
   doPost({ parameter: {
-    orderId: 'HN-TEST', fullName: 'طلب تجريبي', phone: '0550123456', phone2: '',
+    orderId: 'HN-261114-AB23', fullName: 'طلب تجريبي', phone: '0550123456', phone2: '',
     wilaya: 'قسنطينة', commune: 'الخروب', delivery: 'للمنزل',
     deliveryCompany: 'DHD', product: 'حقيبة المهندس برو', items: 'Robot + AutoCAD', qty: '3',
     basePrice: '15000', price: '7500', shipping: '700', total: '8200',

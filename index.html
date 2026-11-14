@@ -7,7 +7,7 @@
 <meta name="description" content="Robot Structural Analysis، AutoCAD Structural Detailing، Charpente Métallique، AutoCAD —دورات تطبيقية مسجلة في فلاشة، من إعداد الأستاذ أمين بنقالة. توصيل لكل الولايات.">
 <meta name="theme-color" content="#050c29">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 <style>
 :root{--bg:#050c29;--bg2:#09153a;--bg3:#0f2150;--bl:#3b8cff;--bl2:#8dbbff;--gr:#39ee6b;--gr2:#1fd37a;--am:#ffc21a;--am2:#ffe08a;--tx:#eef3ff;--mut:#a3b3d9;--ln:rgba(110,150,255,.2);--ok:#25d366;--bad:#ff8080;box-sizing:border-box}
 *,*:before,*:after{box-sizing:inherit}
@@ -489,7 +489,7 @@ function px(){try{if(window.fbq)fbq.apply(null,arguments)}catch(e){}}
 function gc(n){var m=document.cookie.match('(^|;)\\s*'+n+'=([^;]+)');return m?decodeURIComponent(m[2]):''}
 function capi(name,params,eid,user){if(!C.PIXEL||!C.CAPI)return;try{var fc=gc('_fbc'),q=new URLSearchParams(location.search).get('fbclid');if(!fc&&q)fc='fb.1.'+Date.now()+'.'+q;fetch('/api/capi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event:name,event_id:eid,url:location.href,fbp:gc('_fbp'),fbc:fc,custom:params||{},user:user||null}),keepalive:true}).catch(function(){})}catch(e){}}
 function fire(name,params,user){if(!C.PIXEL)return;var eid=name+'_'+Date.now()+'_'+Math.floor(Math.random()*1e9);px('track',name,params||{},{eventID:eid});capi(name,params,eid,user)}
-if(C.PIXEL){!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init',C.PIXEL);fire('PageView');fire('ViewContent',{content_name:'حقيبة المهندس',content_category:'Courses'})}
+if(C.PIXEL){!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];var go=function(){s.parentNode.insertBefore(t,s)};if(window.requestIdleCallback)requestIdleCallback(go,{timeout:1500});else setTimeout(go,800)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init',C.PIXEL);fire('PageView');fire('ViewContent',{content_name:'حقيبة المهندس',content_category:'Courses'})}
 var R='Robot Structural Analysis',A='AutoCAD Structural Detailing',H='Charpente Métallique de Hangar',K='AutoCAD — Dessin des plans génie civil';
 /* الحقائب حسب عدد الدورات التي يختارها الزبون بنفسه (k = عدد الدورات) */
 var PK=[{id:'bag',k:2,n:'حقيبة المهندس',st:2,p:6900},
@@ -558,8 +558,8 @@ var PL=[];
 function fm(s){s=Math.floor(s||0);return Math.floor(s/60)+':'+('0'+s%60).slice(-2)}
 function mkPlayer(root,b64,title){
  root.innerHTML='<button class="apb" type="button" aria-label="تشغيل">▶</button><div class="apm"><b>'+title+'</b><div class="apt"><input type="range" min="0" max="1000" value="0" dir="ltr" aria-label="التقدم"><span>0:00 / 0:00</span></div></div><button class="apx" type="button" aria-label="سرعة التشغيل">1x</button>';
- var a=new Audio(b64),bt=root.querySelector('.apb'),rg=root.querySelector('input'),sp=root.querySelector('span'),sx=root.querySelector('.apx'),S=[1,1.25,1.5],k=0;
- a.preload='metadata';PL.push(a);a.onerror=function(){sp.textContent='الصوتية غير متاحة حالياً'};
+ var a=new Audio();a.preload='none';a.src=b64;var bt=root.querySelector('.apb'),rg=root.querySelector('input'),sp=root.querySelector('span'),sx=root.querySelector('.apx'),S=[1,1.25,1.5],k=0;
+ a.preload='none';PL.push(a);if('IntersectionObserver' in window){var io2=new IntersectionObserver(function(es){if(es[0].isIntersecting){io2.disconnect();a.preload='metadata';a.load()}},{rootMargin:'200px'});io2.observe(root)}else a.preload='metadata';a.onerror=function(){sp.textContent='الصوتية غير متاحة حالياً'};
  function up(){var d=a.duration||0;rg.value=d?a.currentTime/d*1000:0;sp.textContent=fm(a.currentTime)+' / '+fm(d)}
  bt.onclick=function(){if(a.paused){PL.forEach(function(o){if(o!==a)o.pause()});var q=a.play();if(q&&q.catch)q.catch(function(){})}else a.pause()};
  a.onplay=function(){bt.textContent='⏸';bt.setAttribute('aria-label','إيقاف')};
