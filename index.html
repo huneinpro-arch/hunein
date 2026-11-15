@@ -685,6 +685,8 @@ $('rf').addEventListener('change',function(){var f=this.files&&this.files[0];RC=
     var q=.82,d=cv.toDataURL('image/jpeg',q);while(d.length>2.4e6&&q>.4){q-=.12;d=cv.toDataURL('image/jpeg',q)}
     rcBusy=0;RC={b64:d.split(',')[1],mime:'image/jpeg',name:f.name.replace(/\.\w+$/,'')+'.jpg'};rcShow()};
   im.onerror=function(){rcBusy=0;URL.revokeObjectURL(u);rcErr('تعذر قراءة الصورة. جرّب صورة أخرى.')};im.src=u});
+function rcDrive(oid,rc){if(!rc)return Promise.resolve(false);var d=new URLSearchParams({rcOnly:'1',orderId:oid,rcMime:rc.mime,rcData:rc.b64}),n=0;
+  function go(){return fetch(C.SHEET,{method:'POST',mode:'no-cors',body:d}).then(function(){return true},function(){return ++n<3?new Promise(function(r){setTimeout(r,1500*n)}).then(go):false})}return go()}
 function sendRc(o){if(!RC)return Promise.resolve(false);
   return fetch('/api/receipt',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:o.id,name:o.nm,phone:o.ph,course:o.course,amount:o.amount,due:o.due,wilaya:o.w,mime:RC.mime,filename:RC.name,file:RC.b64})})
    .then(function(r){return r.json()}).then(function(j){return !!(j&&j.ok)}).catch(function(){return false})}
@@ -790,8 +792,11 @@ $('f').addEventListener('submit',function(e){e.preventDefault();var er=$('er');e
   thxOpen({oid:oid,nm:nm,n:p.ids.length,t:sel.t,co:c.n,w:sel.w,cm:cmv,tot:tot,paid:paid,due:due,cc:cc,rcOk:true,pn:p.n});
   var rcP=cc?sendRc({id:oid,nm:nm,ph:ph,course:p.val,amount:p.p,due:due,w:W[sel.w-1]}):null;
   qAdd(data);
-  sendRetry(data,3).then(function(ok){if(ok)qDel(oid);else syncWarn(oid,nm)});
-  if(rcP)rcP.then(function(ok){if(!ok&&$('thx').classList.contains('on')&&thxLast){thxLast.rcOk=false;rcFbShow(thxLast)}})});
+  var ordP=sendRetry(data,3).then(function(ok){if(ok)qDel(oid);else syncWarn(oid,nm);return ok});
+  /* الوصل: واتساب أولاً؛ إن تعذّر يُحفظ تلقائياً في Google Drive (نسخة مضمونة) ولا يُطلب من الزبون شيء */
+  if(rcP){var rc=RC;rcP.then(function(ok){if(ok)return;
+    return ordP.then(function(){return rcDrive(oid,rc)}).then(function(saved){
+      if(!saved&&$('thx').classList.contains('on')&&thxLast){thxLast.rcOk=false;rcFbShow(thxLast)}})})}});
 draw();
 if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target)}})},{threshold:.12});document.querySelectorAll('.rv').forEach(function(el){io.observe(el)})}else{document.querySelectorAll('.rv').forEach(function(el){el.classList.add('in')})}
 window.__ok=1;

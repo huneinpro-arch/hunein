@@ -116,11 +116,34 @@ function validate_(raw) {
   return p;
 }
 
+var RC_MIMES_ = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+function attachReceipt_(raw) {
+  var oid = txt_(raw.orderId, 20);
+  if (!ORDER_RE_.test(oid) || !raw.rcData || RC_MIMES_.indexOf(raw.rcMime) < 0) return 'invalid';
+  var it = DriveApp.getFoldersByName('Hunein Receipts');
+  var folder = it.hasNext() ? it.next() : DriveApp.createFolder('Hunein Receipts');
+  var ext = raw.rcMime === 'application/pdf' ? 'pdf' : raw.rcMime.split('/')[1];
+  var url = folder.createFile(Utilities.newBlob(Utilities.base64Decode(raw.rcData), raw.rcMime, oid + '.' + ext)).getUrl();
+  var sh = getSheet_(), last = sh.getLastRow();
+  if (last < 2) return 'norow';
+  var heads = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(norm_);
+  var oc = Math.max(heads.indexOf('orderid'), heads.indexOf('رقمالطلب'));
+  var rc = Math.max(heads.indexOf('الوصل'), heads.indexOf('receipt'));
+  if (oc < 0 || rc < 0) return 'nocol';
+  var ids = sh.getRange(2, oc + 1, last - 1, 1).getValues();
+  for (var i = ids.length - 1; i >= 0; i--) {
+    if (String(ids[i][0]) === oid) { sh.getRange(i + 2, rc + 1).setValue(url); return 'ok'; }
+  }
+  return 'norow';
+}
+
 function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.waitLock(20000);
   try {
     var raw = (e && e.parameter) || {};
+    // رفع وصل الدفع لطلب مسجَّل: يُحفظ في Drive ويوضع رابطه في صف الطلب
+    if (raw.rcOnly) return ContentService.createTextOutput(attachReceipt_(raw));
     // يتجاهل أي طلب فارغ (بدون اسم ولا هاتف)
     if (!raw.fullName && !raw.phone) return ContentService.createTextOutput('empty');
     // يرفض أي طلب غير صالح قبل أن يلمس الجدول
