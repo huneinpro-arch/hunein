@@ -140,8 +140,15 @@ function attachReceipt_(raw) {
 function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.waitLock(20000);
+  var smsJob = null;
   try {
     var raw = (e && e.parameter) || {};
+    // ردّ الزبون على الرسالة (webhook من تطبيق البوابة): 1 = تأكيد، 0 = طلب إلغاء
+    var body = null;
+    if (e && e.postData && /json/i.test(e.postData.type || '')) {
+      try { body = JSON.parse(e.postData.contents); } catch (x) { body = null; }
+    }
+    if (body && body.event === 'sms:received') return ContentService.createTextOutput(handleSmsReply_(body, raw.k));
     // رفع وصل الدفع لطلب مسجَّل: يُحفظ في Drive ويوضع رابطه في صف الطلب
     if (raw.rcOnly) return ContentService.createTextOutput(attachReceipt_(raw));
     // يتجاهل أي طلب فارغ (بدون اسم ولا هاتف)
@@ -187,12 +194,140 @@ function doPost(e) {
     }
     sh.getRange(row, 1, 1, cols).setValues([vals]);
     cache.put('o_' + p.orderId, '1', 21600);
-
-    return ContentService.createTextOutput('ok');
+    smsJob = { phone: p.phone, orderId: p.orderId, ccp: p.paymentMethod === PAYMENT_OK_[1] };
   } finally {
     lock.releaseLock();
   }
+  // يُرسَل بعد تحرير القفل كي لا يبطّئ باقي الطلبات، وفشله لا يؤثر على تسجيل الطلب
+  if (smsJob) { try { sendOrderSms_(smsJob); } catch (err) { Logger.log('sms error: ' + err); } }
+  return ContentService.createTextOutput('ok');
 }
+
+// ===== رسائل SMS التلقائية عبر تطبيق "SMS Gateway for Android" (sms-gate.app) =====
+// الإعدادات تُوضع في: إعدادات المشروع (⚙) ← خصائص النص (Script properties). لا تكتبها داخل الكود:
+//   SMS_ENABLED = 1          (أي قيمة أخرى توقف الإرسال)
+//   SMS_USER / SMS_PASS      بيانات الدخول الظاهرة في تطبيق البوابة (وضع Cloud server)
+//   WEBHOOK_KEY              كلمة سرّ عشوائية طويلة لحماية استقبال الردود
+//   SMS_TEST_PHONE           رقمك (بصيغة 0550123456) لدالة testSms
+var SMS_API_ = 'https://api.sms-gate.app/3rdparty/v1';
+var EXEC_URL_ = 'https://script.google.com/macros/s/AKfycbzNR9VjoDsoEdvt6erg0DQ1p9np2KMuqsWcPHM3xocvfG3xG0HvH8CCvbpKC6wxUOU6/exec';
+var SMS_DAILY_MAX_ = 100;      // سقف الرسائل يومياً
+var SMS_PHONE_TTL_ = 21600;    // رسالة واحدة لكل رقم كل 6 ساعات (أقصى مدة يسمح بها CacheService)
+
+function smsAuth_() {
+  var pr = PropertiesService.getScriptProperties();
+  var u = pr.getProperty('SMS_USER'), pw = pr.getProperty('SMS_PASS');
+  if (!u || !pw) return null;
+  return 'Basic ' + Utilities.base64Encode(u + ':' + pw);
+}
+
+// 0550123456 -> +213550123456
+function intl_(local) { return '+213' + String(local).replace(/\D/g, '').slice(-9); }
+// أي صيغة (+213..., 213..., 0...) -> 0550123456
+function local_(any) { return '0' + String(any || '').replace(/\D/g, '').slice(-9); }
+
+function smsText_(job) {
+  return job.ccp
+    ? 'حنين: استلمنا طلبك ' + job.orderId + ' ووصل الدفع. سنتحقق منه ونتصل بك قريبا. شكرا لثقتك!'
+    : 'حنين: تم تسجيل طلبك ' + job.orderId + '. للتأكيد ردّ بـ 1، وللإلغاء ردّ بـ 0. شكرا لثقتك!';
+}
+
+function sendOrderSms_(job) {
+  var pr = PropertiesService.getScriptProperties();
+  if (pr.getProperty('SMS_ENABLED') !== '1') return 'off';
+  var auth = smsAuth_();
+  if (!auth || !PHONE_RE_.test(job.phone)) return 'skip';
+
+  // حماية من إساءة الاستعمال: رقم واحد لا يتلقى إلا رسالة واحدة كل 6 ساعات، وسقف يومي عام
+  var cache = CacheService.getScriptCache();
+  if (cache.get('sp_' + job.phone)) return 'phone-limit';
+  var day = Utilities.formatDate(new Date(), 'Africa/Algiers', 'yyyy-MM-dd');
+  var cur = String(pr.getProperty('SMS_DAY') || '').split(':');
+  var n = cur[0] === day ? Number(cur[1]) || 0 : 0;
+  if (n >= SMS_DAILY_MAX_) return 'daily-limit';
+  pr.setProperty('SMS_DAY', day + ':' + (n + 1));
+  cache.put('sp_' + job.phone, '1', SMS_PHONE_TTL_);
+
+  var res = UrlFetchApp.fetch(SMS_API_ + '/messages', {
+    method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+    headers: { Authorization: auth },
+    payload: JSON.stringify({ textMessage: { text: smsText_(job) }, phoneNumbers: [intl_(job.phone)] })
+  });
+  Logger.log('sms ' + job.orderId + ' -> ' + res.getResponseCode());
+  return res.getResponseCode();
+}
+
+// أعمدة الجدول بنفس منطق doPost (العمود بلا عنوان بعد المجموع = الحالة)
+function headsOf_(sh) {
+  var heads = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(norm_);
+  for (var k = 1; k < heads.length; k++) {
+    if (heads[k] === '' && (heads[k - 1] === 'product' || heads[k - 1] === 'الدورة')) heads[k] = 'items';
+    if (heads[k] === '' && (heads[k - 1] === 'totalprix' || heads[k - 1] === 'total' || heads[k - 1] === 'المجموع')) heads[k] = 'status';
+  }
+  return heads;
+}
+
+// ردّ الزبون: 1/نعم -> "ردّ بـ 1 (SMS)"، 0/لا -> "ردّ بـ 0 (SMS)". عمداً لا نكتب "مؤكد" حتى لا يُطلق أي إرسال تلقائي لشركة التوصيل؛ أنت تراجع وتؤكد بنفسك.
+// لا يغيّر إلا الطلبات التي ما زالت "طلب جديد".
+function handleSmsReply_(body, key) {
+  var want = PropertiesService.getScriptProperties().getProperty('WEBHOOK_KEY');
+  if (!want || key !== want) return 'forbidden';
+  var pl = body.payload || {};
+  var text = String(pl.message || '').trim()
+    .replace(/[٠-٩]/g, function (d) { return String(d.charCodeAt(0) - 1632); })
+    .replace(/[۰-۹]/g, function (d) { return String(d.charCodeAt(0) - 1776); })
+    .replace(/[.!،\s]+$/g, '').toLowerCase();
+  var label = null;
+  if (/^(1|نعم|اي|أي|ايه|oui|ok|yes)$/.test(text)) label = 'ردّ بـ 1 (SMS)';
+  else if (/^(0|لا|no|non|الغاء|إلغاء)$/.test(text)) label = 'ردّ بـ 0 (SMS)';
+  if (!label) return 'ignored';
+
+  var phone = local_(pl.sender || pl.phoneNumber);
+  if (!PHONE_RE_.test(phone)) return 'bad-phone';
+  var sh = getSheet_(), last = sh.getLastRow();
+  if (last < 2) return 'norow';
+  var heads = headsOf_(sh);
+  var pc = Math.max(heads.indexOf('phone'), heads.indexOf('الهاتف'));
+  var sc = Math.max(heads.indexOf('status'), heads.indexOf('الحالة'));
+  if (pc < 0 || sc < 0) return 'nocol';
+  var ph = sh.getRange(2, pc + 1, last - 1, 1).getValues();
+  var st = sh.getRange(2, sc + 1, last - 1, 1).getValues();
+  for (var i = ph.length - 1; i >= 0; i--) {          // أحدث طلب لهذا الرقم
+    if (String(ph[i][0]).indexOf(phone) < 0) continue;
+    var cur = String(st[i][0]).trim();
+    if (cur === '' || cur === 'طلب جديد') { sh.getRange(i + 2, sc + 1).setValue(label); return 'ok'; }
+    return 'kept';                                    // حالة لاحقة (تأكيد/توصيل...) لا نغيّرها
+  }
+  return 'nomatch';
+}
+
+// ===== دوال تُشغَّل يدوياً من المحرر مرة واحدة =====
+// تسجّل في تطبيق البوابة عنوان استقبال الردود (بعد ضبط SMS_USER وSMS_PASS وWEBHOOK_KEY)
+function registerSmsWebhook() {
+  var key = PropertiesService.getScriptProperties().getProperty('WEBHOOK_KEY');
+  var auth = smsAuth_();
+  if (!key || !auth) throw new Error('اضبط SMS_USER وSMS_PASS وWEBHOOK_KEY أولاً في Script properties');
+  var res = UrlFetchApp.fetch(SMS_API_ + '/webhooks', {
+    method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+    headers: { Authorization: auth },
+    payload: JSON.stringify({ url: EXEC_URL_ + '?k=' + encodeURIComponent(key), event: 'sms:received' })
+  });
+  Logger.log(res.getResponseCode() + ' ' + res.getContentText());
+}
+
+// يرسل رسالة تجريبية إلى SMS_TEST_PHONE (يتجاوز حدّ الرقم الواحد)
+function testSms() {
+  var pr = PropertiesService.getScriptProperties();
+  var phone = pr.getProperty('SMS_TEST_PHONE'), auth = smsAuth_();
+  if (!auth || !PHONE_RE_.test(phone || '')) throw new Error('اضبط SMS_USER وSMS_PASS وSMS_TEST_PHONE (مثل 0550123456)');
+  var res = UrlFetchApp.fetch(SMS_API_ + '/messages', {
+    method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+    headers: { Authorization: auth },
+    payload: JSON.stringify({ textMessage: { text: smsText_({ orderId: 'HN-000000-TEST', ccp: false }) }, phoneNumbers: [intl_(phone)] })
+  });
+  Logger.log(res.getResponseCode() + ' ' + res.getContentText());
+}
+
 
 function doGet() {
   return ContentService.createTextOutput('الخدمة تعمل');
