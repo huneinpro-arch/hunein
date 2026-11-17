@@ -510,8 +510,8 @@ var CO=[{id:'dhd',n:'DHD',o:400,h:600}];
 /* أسعار DHD حسب الولاية (h منزل، o مكتب). القيمة 0 = الخدمة غير متوفرة. يمكنك إضافة شركات أخرى بنفس الطريقة: RATES.yal={...} */
 var RATES={dhd:{1:{h:1100,o:600},2:{h:700,o:400},3:{h:900,o:500},4:{h:800,o:400},5:{h:800,o:400},6:{h:700,o:400},7:{h:900,o:500},8:{h:1300,o:600},9:{h:500,o:350},10:{h:700,o:400},11:{h:1300,o:600},12:{h:900,o:500},13:{h:700,o:400},14:{h:700,o:400},15:{h:700,o:400},16:{h:500,o:400},17:{h:900,o:500},18:{h:700,o:400},19:{h:700,o:400},20:{h:600,o:400},21:{h:700,o:400},22:{h:600,o:400},23:{h:700,o:400},24:{h:800,o:400},25:{h:700,o:400},26:{h:700,o:400},27:{h:600,o:400},28:{h:800,o:500},29:{h:500,o:300},30:{h:900,o:500},31:{h:600,o:400},32:{h:900,o:500},33:{h:1300,o:600},34:{h:700,o:400},35:{h:700,o:400},36:{h:800,o:400},37:{h:1300,o:600},38:{h:700,o:400},39:{h:1000,o:500},40:{h:800,o:500},41:{h:800,o:500},42:{h:700,o:400},43:{h:700,o:400},44:{h:700,o:400},45:{h:900,o:500},46:{h:700,o:400},47:{h:1000,o:500},48:{h:600,o:400},49:{h:1300,o:600},50:{h:0,o:0},51:{h:900,o:500},52:{h:1300,o:0},53:{h:1300,o:600},54:{h:0,o:0},55:{h:900,o:500},56:{h:0,o:0},57:{h:900,o:0},58:{h:1000,o:500}}};
 var W=["Adrar","Chlef","Laghouat","Oum El Bouaghi","Batna","Béjaïa","Biskra","Béchar","Blida","Bouira","Tamanrasset","Tébessa","Tlemcen","Tiaret","Tizi Ouzou","Alger","Djelfa","Jijel","Sétif","Saïda","Skikda","Sidi Bel Abbès","Annaba","Guelma","Constantine","Médéa","Mostaganem","M'Sila","Mascara","Ouargla","Oran","El Bayadh","Illizi","Bordj Bou Arréridj","Boumerdès","El Tarf","Tindouf","Tissemsilt","El Oued","Khenchela","Souk Ahras","Tipaza","Mila","Aïn Defla","Naâma","Aïn Témouchent","Ghardaïa","Relizane","Timimoun","Bordj Badji Mokhtar","Ouled Djellal","Béni Abbès","In Salah","In Guezzam","Touggourt","Djanet","El M'Ghair","El Menia"];
-/* البلديات التي بها مكاتب توصيل DHD، لكل ولاية (بالفرنسية). التوصيل للمنزل: يختار الزبون بلديته من القائمة أو "بلدية أخرى" ويكتبها بالفرنسية. */
-var CMF={1:["Adrar"],2:["Chlef","Ténès"],3:["Laghouat"],4:["Aïn Fakroun","Oum El Bouaghi"],5:["Barika","Batna"],6:["Béjaïa","Kherrata"],7:["Biskra"],8:["Béchar"],9:["Beni Mered","Blida","Boufarik","Bouinan","Ouled Yaïch"],10:["Bouira"],11:["Tamanrasset"],12:["Tébessa"],13:["Sebdou","Tlemcen"],14:["Ksar Chellala","Tiaret"],15:["Tizi Ouzou"],16:["Aïn Benian","Alger Centre","Bab El Oued","Bab Ezzouar","Birtouta","Chéraga","Draria","Kouba","Les Eucalyptus","Réghaïa"],17:["Aïn Oussera","Djelfa"],18:["Jijel"],19:["El Eulma","Sétif"],20:["Saïda"],21:["El Harrouch","Skikda"],22:["Sidi Bel Abbès"],23:["Annaba","El Bouni"],24:["Guelma"],25:["Constantine","El Khroub"],26:["Médéa"],27:["Mazagran","Mostaganem"],28:["Bou Saâda","M'Sila"],29:["Mascara","Sig"],30:["Ouargla"],31:["Bir El Djir","Oran","Sidi Chahmi"],32:["El Bayadh"],33:["Illizi"],34:["Bordj Bou Arréridj"],35:["Bordj Menaïel","Boumerdès"],36:["El Tarf"],37:["Tindouf"],38:["Tissemsilt"],39:["El Oued"],40:["Khenchela"],41:["Souk Ahras"],42:["Koléa","Tipaza"],43:["Mila"],44:["Aïn Defla","El Attaf","Khemis Miliana"],45:["Mécheria"],46:["Aïn Témouchent"],47:["Ghardaïa"],48:["Relizane"],49:["Timimoun"],50:["Bordj Badji Mokhtar"],51:["Ouled Djellal"],52:["Béni Abbès"],53:["In Salah"],54:["In Guezzam"],55:["Touggourt"],56:["Djanet"],57:["El M'Ghair"],58:["El Menia"]};
+/* البلديات التي بها مكاتب توصيل DHD، لكل ولاية، بأسماء DHD الفرنسية الدقيقة. التوصيل للمنزل: قائمة كل بلديات الولاية تُحمَّل من /c/<رقم الولاية>.json (القيمة فرنسية بصيغة DHD، والنص الظاهر عربي أو فرنسي حسب لغة الصفحة). */
+var CMF={1:["Adrar"],2:["Chlef","Tenes"],3:["Laghouat"],4:["Ain Fekroune","Oum El Bouaghi"],5:["Barika","Batna"],6:["Bejaia","Kherrata"],7:["Biskra"],8:["Bechar"],9:["Beni Mered","Blida","Boufarik","Bouinan","Ouled Yaich"],10:["Bouira"],11:["Tamanrasset"],12:["Tebessa"],13:["Sebdou","Tlemcen"],14:["Ksar Chellala","Tiaret"],15:["Tizi Ouzou"],16:["Ain Benian","Alger Centre","Bab El Oued","Bab Ezzouar","Bir Touta","Cheraga","Draria","Kouba","Les Eucalyptus","Reghaia"],17:["Ain Oussera","Djelfa"],18:["Jijel"],19:["El Eulma","Setif"],20:["Saida"],21:["El Arrouch","Skikda"],22:["Sidi Bel Abbes"],23:["Annaba","El Bouni"],24:["Guelma"],25:["Constantine","El Khroub"],26:["Medea"],27:["Mazagran","Mostaganem"],28:["Bou Saada","M'sila"],29:["Mascara","Sig"],30:["Ouargla"],31:["Bir El Djir","Oran","Sidi Chami"],32:["El Bayadh"],33:["Illizi"],34:["Bordj Bou Arreridj"],35:["Bordj Menaiel","Boumerdes"],36:["El Tarf"],37:["Tindouf"],38:["Tissemsilt"],39:["El Oued"],40:["Khenchela"],41:["Souk Ahras"],42:["Kolea","Tipaza"],43:["Mila"],44:["Ain Defla","El Attaf","Khemis Miliana"],45:["Mecheria"],46:["Ain Temouchent"],47:["Ghardaia"],48:["Relizane"],49:["Timimoun"],50:["Bordj Badji Mokhtar"],51:["Ouled Djellal"],52:["Beni Abbes"],53:["In Salah"],54:["In Guezzam"],55:["Touggourt"],56:["Djanet"],57:["El M'ghair"],58:["El Meniaa"]};
 /* ================= نهاية الإعدادات ================= */
 var $=function(i){return document.getElementById(i)};
 function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -622,14 +622,28 @@ function draw(){
  $('co').innerHTML=CO.map(function(c){var r=rt(c.id,sel.w),na=r.o<=0&&r.h<=0;return '<div class="op'+(sel.c==c.id?' on':'')+(na?' off':'')+'" data-sc="'+c.id+'" role="button" tabindex="0"><i class="ic">🚚</i><span class="tx">'+c.n+'<small>'+(na?'غير متوفر في ولايتك':'مكتب '+(r.o>0?m(r.o):'—')+' · منزل '+(r.h>0?m(r.h):'—'))+'</small></span></div>'}).join('');
  $('ty').innerHTML=[['h','🏠','التوصيل للمنزل'],['o','🏢','التوصيل لمكتب الشركة']].map(function(x){var v=pr(sel.c,sel.w,x[0]);return '<div class="op'+(sel.t==x[0]?' on':'')+(v<=0?' off':'')+'" data-st="'+x[0]+'" role="button" tabindex="0"><i class="ic">'+x[1]+'</i><span class="tx">'+x[2]+'</span><b>'+(v>0?m(v):'غير متوفر')+'</b></div>'}).join('');
  cm();if(sel.w&&rate()<=0)$('nt').textContent='⚠️ '+co().n+' لا تغطي هذا الخيار في ولايتك حالياً. تواصل معنا عبر واتساب حنين '+C.WA_SHOW+' لترتيب التوصيل.';pm();sum()}
+var CMC={},CMP={};
+function cmGet(w,cb){if(CMC[w])return cb(CMC[w]);
+ if(CMP[w])return CMP[w].push(cb);CMP[w]=[cb];
+ fetch('/c/'+w+'.json').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(d){if(!d||!d.length)throw 0;CMC[w]=d;var q=CMP[w];delete CMP[w];q.forEach(function(f){f(d)})},function(){var q=CMP[w];delete CMP[w];q.forEach(function(f){f(null)})})}
+function cmLab(w,n){var d=CMC[w];if(thxLang()!='ar'||!d)return n;for(var i=0;i<d.length;i++)if(d[i][0]==n)return d[i][1]||n;return n}
+function cmRelabel(){var s=$('cm'),w=sel.w;if(!s||!w)return;[].forEach.call(s.options,function(o){if(o.value&&o.value!='__o'){var t=cmLab(w,o.value);if(o.textContent!==t)o.textContent=t}})}
+new MutationObserver(cmRelabel).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
 function cm(){var s=$('cm'),tx=$('cmt'),nt=$('nt'),keep=s.value;
  tx.style.display='none';s.style.display='';s.disabled=false;nt.textContent='';
  if(!sel.w){s.innerHTML='<option value="">اختر الولاية أولاً</option>';s.disabled=true;return}
- var list=lst(),home=sel.t=='h';
- s.innerHTML='<option value="">اختر البلدية</option>'+list.map(function(n){return '<option>'+esc(n)+'</option>'}).join('')+(home?'<option value="__o">بلدية أخرى (اكتبها بالفرنسية)</option>':'');
- if(keep&&[].some.call(s.options,function(o){return o.value==keep}))s.value=keep;
- s.onchange=function(){tx.style.display=s.value=='__o'?'':'none';if(s.value=='__o')tx.focus()};
- tx.style.display=s.value=='__o'?'':'none';
+ var w=sel.w,home=sel.t=='h';
+ function fill(names,other){
+  s.innerHTML='<option value="">اختر البلدية</option>'+names.map(function(n){return '<option value="'+esc(n)+'">'+esc(cmLab(w,n))+'</option>'}).join('')+(other?'<option value="__o">بلدية أخرى (اكتبها بالفرنسية)</option>':'');
+  if(keep&&[].some.call(s.options,function(o){return o.value==keep}))s.value=keep;
+  s.onchange=function(){tx.style.display=s.value=='__o'?'':'none';if(s.value=='__o')tx.focus()};
+  tx.style.display=s.value=='__o'?'':'none'}
+ if(home){
+  /* للمنزل: كل بلديات الولاية بأسماء DHD. وإن تعذّر التحميل نعود للقائمة القديمة مع خيار الكتابة حتى لا يتعطل الطلب */
+  if(CMC[w])fill(CMC[w].map(function(x){return x[0]}),false);
+  else{s.innerHTML='<option value="">جارٍ تحميل البلديات...</option>';s.disabled=true;
+   cmGet(w,function(d){if(sel.w!=w||sel.t!='h')return;s.disabled=false;if(d)fill(d.map(function(x){return x[0]}),false);else fill(lst(),true)})}
+ }else{fill(lst(),false);if(!CMC[w])cmGet(w,function(d){if(d&&sel.w==w&&sel.t!='h')cmRelabel()})}
  nt.textContent=home?'اختر بلديتك':'📍 تظهر هنا البلديات التي بها مكاتب '+co().n+' في هذه الولاية.'}
 /* شريط الحقيبة: يبيّن الحقيبة الحالية والدورة التالية التي تفتح حقيبة أكبر */
 function tr(){var n=sel.cs.length,t=tier(n),nx=tier(n+1),p=cur(),h='',up='';
@@ -986,7 +1000,7 @@ var D=[
 ["الصوتية غير متاحة حالياً","Audio indisponible pour le moment","Audio currently unavailable"],
 ["الرجاء التسجيل برقم الواتساب أفضل حتى يتسنى لنا مراسلتكم أو التواصل معكم.","Merci d’indiquer de préférence votre numéro WhatsApp afin que nous puissions vous écrire ou vous contacter.","Please enter your WhatsApp number if possible so we can message or contact you."],
 ["رقم الهاتف (واتساب)","Numéro de téléphone (WhatsApp)","Phone number (WhatsApp)"],
-["بلدية أخرى (اكتبها بالفرنسية)","Autre commune (à écrire en français)","Other commune (write it in French)"],
+["بلدية أخرى (اكتبها بالفرنسية)","Autre commune (à écrire en français)","Other commune (write it in French)"],["جارٍ تحميل البلديات...","Chargement des communes...","Loading communes..."],
 ["اختر بلديتك","Choisissez votre commune","Choose your commune"],
 ["📍 تظهر هنا البلديات التي بها مكاتب {0} في هذه الولاية.","📍 Seules les communes disposant d’un bureau {0} dans cette wilaya sont affichées.","📍 Only communes with a {0} office in this wilaya are shown."],
 ["اكتب اسم بلديتك بالفرنسية (Ex : Bab Ezzouar)","Écrivez le nom de votre commune (Ex : Bab Ezzouar)","Type your commune name in French (Ex: Bab Ezzouar)"]

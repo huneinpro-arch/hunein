@@ -500,7 +500,151 @@ function installSmsTrackingTrigger() {
   ScriptApp.newTrigger('runSmsTracking').timeBased().everyMinutes(10).create();
 }
 
-function doGet() {
+// ===== فحص هيكل إعدادات شركات التوصيل دون كشف أي سرّ =====
+// تُطبع أسماء الحقول وأنواعها فقط. القيم النصية تُخفى (يظهر طولها)، ما عدا الروابط (بلا parameters)
+// وبضع كلمات معروفة وغير سرّية (مثل Authorization و Bearer).
+function redactCfg_(v) {
+  var SAFE = /^(authorization|bearer|x-[\w-]+|content-type|get|post|json|true|false)$/i;
+  if (v === null || typeof v === 'number' || typeof v === 'boolean') return v;
+  if (typeof v === 'string') {
+    if (/^https?:\/\//i.test(v)) return v.split('?')[0].slice(0, 120);
+    if (SAFE.test(v)) return v;
+    return '<' + v.length + ' chars>';
+  }
+  if (Array.isArray(v)) return v.map(redactCfg_);
+  var o = {};
+  Object.keys(v).forEach(function (k) { o[k] = redactCfg_(v[k]); });
+  return o;
+}
+
+function inspectShippingConfig() {
+  var raw = PropertiesService.getScriptProperties().getProperty('SHIPPING_COMPANIES_V1');
+  if (!raw) { Logger.log('SHIPPING_COMPANIES_V1 غير موجودة'); return; }
+  var data;
+  try { data = JSON.parse(raw); } catch (e) { Logger.log('ليست JSON، طولها ' + raw.length); return; }
+  Logger.log(JSON.stringify(redactCfg_(data)));
+}
+
+// ===== تصدير بلديات DHD (مرة واحدة) إلى ورقة "DHD Communes" =====
+// يقرأ مفتاح DHD من إعداداتك (SHIPPING_COMPANIES_V1) ولا يطبعه أبداً. شغّل exportDhdCommunes مرة واحدة.
+var COMMUNES_SHEET_ = 'DHD Communes';
+
+function dhdPickName_(it) {
+  if (typeof it === 'string') return it.trim();
+  if (!it || typeof it !== 'object') return '';
+  var keys = ['nom', 'name', 'commune_name', 'nom_commune', 'commune', 'libelle', 'label', 'designation'];
+  for (var i = 0; i < keys.length; i++) {
+    if (typeof it[keys[i]] === 'string' && it[keys[i]].trim()) return it[keys[i]].trim();
+  }
+  return '';
+}
+
+function dhdPickWilaya_(it) {
+  if (!it || typeof it !== 'object') return 0;
+  var keys = ['wilaya_id', 'id_wilaya', 'code_wilaya', 'wilaya'];
+  for (var i = 0; i < keys.length; i++) {
+    var n = Number(it[keys[i]]);
+    if (n > 0 && n < 100) return n;
+  }
+  return 0;
+}
+
+// يحوّل أي شكل شائع للردّ (مصفوفة، {data:[...]}، كائن مفاتيحه معرّفات) إلى قائمة عناصر
+function dhdList_(j) {
+  if (Array.isArray(j)) return j;
+  if (j && Array.isArray(j.data)) return j.data;
+  if (j && typeof j === 'object') {
+    var vals = Object.keys(j).map(function (k) { return j[k]; });
+    if (vals.length && vals.every(function (v) { return v && typeof v === 'object'; })) {
+      var flat = [];
+      vals.forEach(function (v) { flat = Array.isArray(v) ? flat.concat(v) : flat.concat([v]); });
+      return flat;
+    }
+    return Object.keys(j).map(function (k) { return typeof j[k] === 'string' ? j[k] : null; }).filter(Boolean);
+  }
+  return [];
+}
+
+function exportDhdCommunes() {
+  var raw = PropertiesService.getScriptProperties().getProperty('SHIPPING_COMPANIES_V1');
+  if (!raw) throw new Error('SHIPPING_COMPANIES_V1 غير موجودة');
+  var cfg = JSON.parse(raw).dhd;
+  if (!cfg || !cfg.api_url || !cfg.api_key) throw new Error('إعدادات DHD ناقصة');
+  var base = String(cfg.api_url).replace(/\/+$/, '');
+  var ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SHEET_ID);
+  var sh = ss.getSheetByName(COMMUNES_SHEET_) || ss.insertSheet(COMMUNES_SHEET_);
+
+  // يكمل من حيث توقف: الولايات الموجودة في الورقة تُتخطّى، والجديد يُضاف بعدها ويُحفظ ولاية بولاية
+  var seen = {}, done = {};
+  if (sh.getLastRow() > 1) {
+    sh.getRange(2, 1, sh.getLastRow() - 1, 2).getValues().forEach(function (r) {
+      seen[r[0] + '|' + r[1]] = 1; done[Number(r[0])] = 1;
+    });
+  } else {
+    sh.getRange(1, 1, 1, 3).setValues([['wilaya_id', 'name', 'raw']]);
+  }
+
+  var fails = 0, firstLogged = false;
+  for (var w = 1; w <= 58; w++) {
+    if (done[w]) continue;
+    var code = 0, body = '';
+    for (var t = 0; t < 3; t++) {                     // DHD تحدّ الطلبات: عند 429 ننتظر ثم نعيد
+      var res = UrlFetchApp.fetch(base + '/api/v1/get/communes?wilaya_id=' + w, {
+        method: 'get', muteHttpExceptions: true,
+        headers: { Authorization: 'Bearer ' + cfg.api_key, Accept: 'application/json' }
+      });
+      code = res.getResponseCode(); body = res.getContentText();
+      if (code !== 429) break;
+      Logger.log('wilaya ' + w + ' -> 429، انتظار ثم إعادة المحاولة');
+      Utilities.sleep(25000 * (t + 1));
+    }
+    if (!firstLogged) { firstLogged = true; Logger.log('wilaya ' + w + ' -> ' + code + ' ' + body.length + ' chars: ' + body.slice(0, 200)); }
+    if (code === 429) { Logger.log('ما زالت DHD تحدّ الطلبات؛ أعد التشغيل بعد دقائق لإكمال الباقي'); break; }
+    if (code !== 200) {
+      Logger.log('wilaya ' + w + ' failed: ' + code + ' ' + body.slice(0, 120));
+      if (++fails >= 3) break;
+      continue;
+    }
+    var j;
+    try { j = JSON.parse(body); } catch (e) { Logger.log('wilaya ' + w + ' ليس JSON'); if (++fails >= 3) break; continue; }
+    var chunk = [];
+    dhdList_(j).forEach(function (it) {
+      var name = dhdPickName_(it), ww = dhdPickWilaya_(it) || w;
+      if (!name) return;
+      var key = ww + '|' + name;
+      if (seen[key]) return;
+      seen[key] = 1;
+      chunk.push([ww, name, typeof it === 'object' ? JSON.stringify(it).slice(0, 300) : '']);
+    });
+    if (chunk.length) sh.getRange(sh.getLastRow() + 1, 1, chunk.length, 3).setValues(chunk);
+    Logger.log('wilaya ' + w + ': ' + chunk.length);
+    Utilities.sleep(1500);                            // إيقاع أبطأ تجنباً للحدّ
+  }
+  var missing = [];
+  for (var k = 1; k <= 58; k++) {
+    var has = false;
+    if (done[k]) has = true;
+    else { for (var key2 in seen) { if (key2.indexOf(k + '|') === 0) { has = true; break; } } }
+    if (!has) missing.push(k);
+  }
+  var total = Math.max(sh.getLastRow() - 1, 0);
+  Logger.log('TOTAL ' + total + (missing.length ? ' | ناقص: ' + missing.join(',') : ' | كل الولايات موجودة'));
+  return total;
+}
+
+// يقدّم الأسماء فقط (بلا الحقول الخام) لمن يطلب ?dhdcommunes=1
+function dhdCommunesJson_() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SHEET_ID);
+  var sh = ss.getSheetByName(COMMUNES_SHEET_);
+  var out = [];
+  if (sh && sh.getLastRow() > 1) {
+    sh.getRange(2, 1, sh.getLastRow() - 1, 2).getValues().forEach(function (r) { out.push([Number(r[0]), String(r[1])]); });
+  }
+  return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet(e) {
+  if (e && e.parameter && e.parameter.dhdcommunes === '1') return dhdCommunesJson_();
   return ContentService.createTextOutput('الخدمة تعمل');
 }
 
