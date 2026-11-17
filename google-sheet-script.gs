@@ -156,6 +156,8 @@ function doPost(e) {
     // يرفض أي طلب غير صالح قبل أن يلمس الجدول
     var p = validate_(raw);
     if (!p) return ContentService.createTextOutput('invalid');
+    // اسم البلدية يُوحَّد مع قائمة DHD (فروق الحروف والشرطات فقط)؛ ولا يعطّل الطلب إن تعذّر
+    try { p.commune = dhdCommune_(p.wilaya, p.commune); } catch (errC) { Logger.log('commune normalize: ' + errC); }
     // يمنع التكرار: الموقع قد يعيد إرسال الطلب نفسه عند ضعف الشبكة (نفس رقم الطلب يُسجَّل مرة واحدة)
     var cache = CacheService.getScriptCache();
     if (cache.get('o_' + p.orderId)) return ContentService.createTextOutput('dup');
@@ -641,6 +643,141 @@ function dhdCommunesJson_() {
     sh.getRange(2, 1, sh.getLastRow() - 1, 2).getValues().forEach(function (r) { out.push([Number(r[0]), String(r[1])]); });
   }
   return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
+}
+
+// ===== توحيد اسم البلدية مع قائمة DHD (ورقة "DHD Communes") =====
+// أسماء الولايات كما يرسلها الموقع، والترتيب = رقم الولاية عند DHD (1..58)
+var WILAYAS_ = ["Adrar", "Chlef", "Laghouat", "Oum El Bouaghi", "Batna", "Béjaïa", "Biskra", "Béchar", "Blida", "Bouira", "Tamanrasset", "Tébessa", "Tlemcen", "Tiaret", "Tizi Ouzou", "Alger", "Djelfa", "Jijel", "Sétif", "Saïda", "Skikda", "Sidi Bel Abbès", "Annaba", "Guelma", "Constantine", "Médéa", "Mostaganem", "M'Sila", "Mascara", "Ouargla", "Oran", "El Bayadh", "Illizi", "Bordj Bou Arréridj", "Boumerdès", "El Tarf", "Tindouf", "Tissemsilt", "El Oued", "Khenchela", "Souk Ahras", "Tipaza", "Mila", "Aïn Defla", "Naâma", "Aïn Témouchent", "Ghardaïa", "Relizane", "Timimoun", "Bordj Badji Mokhtar", "Ouled Djellal", "Béni Abbès", "In Salah", "In Guezzam", "Touggourt", "Djanet", "El M'Ghair", "El Menia"];
+
+function dhdKey_(s) {
+  return String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+// "15 - Tizi Ouzou" أو "Tizi Ouzou" أو "15" -> رقم الولاية، وإلا 0
+function wilayaIdOf_(v) {
+  var s = String(v == null ? '' : v).trim();
+  var m = /^(\d{1,2})\b/.exec(s);
+  if (m && Number(m[1]) >= 1 && Number(m[1]) <= 58) return Number(m[1]);
+  var k = dhdKey_(s.replace(/^\d+\s*-\s*/, ''));
+  for (var i = 0; i < WILAYAS_.length; i++) if (dhdKey_(WILAYAS_[i]) === k) return i + 1;
+  return 0;
+}
+
+// بلديات ولاية واحدة من ورقة DHD Communes (مخزَّنة مؤقتاً 6 ساعات)
+function dhdCommunesOf_(id) {
+  var cache = CacheService.getScriptCache(), ck = 'dc_' + id, hit = cache.get(ck);
+  if (hit) { try { return JSON.parse(hit); } catch (e) {} }
+  var ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SHEET_ID);
+  var sh = ss.getSheetByName(COMMUNES_SHEET_), out = [];
+  if (sh && sh.getLastRow() > 1) {
+    sh.getRange(2, 1, sh.getLastRow() - 1, 2).getValues().forEach(function (r) {
+      if (Number(r[0]) === id) out.push(String(r[1]));
+    });
+  }
+  if (out.length) { try { cache.put(ck, JSON.stringify(out), 21600); } catch (e) {} }
+  return out;
+}
+
+// يعيد اسم DHD الدقيق إن طابق الاسم بعد توحيد الحروف والشرطات؛ وإلا يعيده كما هو (لا نخمّن)
+function dhdCommune_(wilaya, commune) {
+  var id = wilayaIdOf_(wilaya), c = String(commune == null ? '' : commune).trim();
+  if (!id || !c) return c;
+  var names = dhdCommunesOf_(id);
+  if (!names.length) return c;
+  if (names.indexOf(c) > -1) return c;
+  var k = dhdKey_(c), hit = names.filter(function (n) { return dhdKey_(n) === k; });
+  return hit.length === 1 ? hit[0] : c;
+}
+
+// معاينة: تكتب في ورقة "Communes Check" كل طلب اسم بلديته يخالف DHD، دون تغيير أي طلب
+function checkCommunes() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SHEET_ID);
+  var rep = [['ورقة', 'صف', 'الولاية', 'البلدية الحالية', 'اسم DHD المقترح', 'النوع', 'بلدية Management لنفس الطلب', 'رقم الطلب']];
+  // ما كُتب في Management لكل رقم طلب (للتشخيص، حتى لو لم يكن اسماً صالحاً)
+  var mgAny = {}, msh = ss.getSheetByName('Management');
+  if (msh && msh.getLastRow() > 1) {
+    var mh = msh.getRange(1, 1, 1, msh.getLastColumn()).getValues()[0].map(norm_);
+    var mi = mh.indexOf('orderid'), mb = mh.indexOf('baladia');
+    if (mi > -1 && mb > -1) {
+      msh.getRange(2, 1, msh.getLastRow() - 1, Math.max(mi, mb) + 1).getValues().forEach(function (r) {
+        var id = String(r[mi]).trim(); if (id) mgAny[id] = String(r[mb]).trim();
+      });
+    }
+  }
+  ['Processing Orders', 'Management'].forEach(function (name) {
+    var sh = ss.getSheetByName(name);
+    if (!sh || sh.getLastRow() < 2) return;
+    var heads = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(norm_);
+    var cw = heads.indexOf('wilaya'), cb = heads.indexOf('baladia'), ci = heads.indexOf('orderid');
+    if (cw < 0 || cb < 0) return;
+    var data = sh.getRange(2, 1, sh.getLastRow() - 1, Math.max(cw, cb, ci) + 1).getValues();
+    data.forEach(function (r, i) {
+      var cur = String(r[cb]).trim(), id = ci > -1 ? String(r[ci]).trim() : '', wid = wilayaIdOf_(r[cw]);
+      if (!cur || !wid) return;
+      var names = dhdCommunesOf_(wid);
+      if (!names.length || names.indexOf(cur) > -1) return;
+      var fixed = dhdCommune_(r[cw], cur);
+      var inMg = Object.prototype.hasOwnProperty.call(mgAny, id) ? (mgAny[id] || '(فارغة)') : '(الطلب غير موجود في Management)';
+      rep.push([name, i + 2, String(r[cw]), cur, fixed !== cur ? fixed : '', fixed !== cur ? 'يُصحَّح تلقائياً' : 'يحتاج مراجعتك', inMg, id]);
+    });
+  });
+  var sh2 = ss.getSheetByName('Communes Check') || ss.insertSheet('Communes Check');
+  sh2.clear();
+  sh2.getRange(1, 1, rep.length, rep[0].length).setValues(rep);
+  var auto = rep.filter(function (r) { return r[5] === 'يُصحَّح تلقائياً'; }).length;
+  Logger.log('طلبات تخالف DHD: ' + (rep.length - 1) + ' | يُصحَّح تلقائياً: ' + auto + ' | يحتاج مراجعة: ' + (rep.length - 1 - auto));
+  return rep.length - 1;
+}
+
+// تطبيق: لكل صف اسم بلديته ليس من قائمة DHD:
+//  1) في Processing Orders تُؤخذ البلدية المؤكَّدة من ورقة Management لنفس رقم الطلب (راجعها المؤكِّدون)
+//  2) وإلا يُصحَّح الفرق في الحروف والشرطات فقط. وما سوى ذلك لا يُمَسّ. كل تغيير يُسجَّل في ورقة "Communes Fixed".
+function applyCommuneFixes() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SHEET_ID);
+  var audit = [['ورقة', 'صف', 'رقم الطلب', 'قبل', 'بعد', 'المصدر']], fromMg = 0, auto = 0;
+
+  // البلديات المؤكَّدة في Management: رقم الطلب -> اسم DHD صالح
+  var mg = {}, msh = ss.getSheetByName('Management');
+  if (msh && msh.getLastRow() > 1) {
+    var mh = msh.getRange(1, 1, 1, msh.getLastColumn()).getValues()[0].map(norm_);
+    var mi = mh.indexOf('orderid'), mb = mh.indexOf('baladia'), mw = mh.indexOf('wilaya');
+    if (mi > -1 && mb > -1 && mw > -1) {
+      msh.getRange(2, 1, msh.getLastRow() - 1, Math.max(mi, mb, mw) + 1).getValues().forEach(function (r) {
+        var id = String(r[mi]).trim(), val = String(r[mb]).trim(), wid = wilayaIdOf_(r[mw]);
+        if (id && val && wid && dhdCommunesOf_(wid).indexOf(val) > -1) mg[id] = val;
+      });
+    }
+  }
+
+  ['Processing Orders', 'Management'].forEach(function (name) {
+    var sh = ss.getSheetByName(name);
+    if (!sh || sh.getLastRow() < 2) return;
+    var heads = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(norm_);
+    var cw = heads.indexOf('wilaya'), cb = heads.indexOf('baladia'), ci = heads.indexOf('orderid');
+    if (cw < 0 || cb < 0) return;
+    var data = sh.getRange(2, 1, sh.getLastRow() - 1, Math.max(cw, cb, ci) + 1).getValues();
+    data.forEach(function (r, i) {
+      var cur = String(r[cb]).trim(), id = ci > -1 ? String(r[ci]).trim() : '', wid = wilayaIdOf_(r[cw]);
+      if (!cur || !wid) return;
+      var names = dhdCommunesOf_(wid);
+      if (!names.length || names.indexOf(cur) > -1) return;           // سليم أو لا قائمة للمقارنة
+      var fixed = '', src = '';
+      if (name === 'Processing Orders' && mg[id]) { fixed = mg[id]; src = 'Management'; }
+      else { var f = dhdCommune_(r[cw], cur); if (f !== cur) { fixed = f; src = 'تلقائي'; } }
+      if (!fixed || fixed === cur) return;
+      sh.getRange(i + 2, cb + 1).setValue(fixed);
+      if (src === 'Management') fromMg++; else auto++;
+      audit.push([name, i + 2, id, cur, fixed, src]);
+    });
+  });
+
+  if (audit.length > 1) {
+    var as = ss.getSheetByName('Communes Fixed') || ss.insertSheet('Communes Fixed');
+    as.clear();
+    as.getRange(1, 1, audit.length, 6).setValues(audit);
+  }
+  Logger.log('تم تصحيح ' + (fromMg + auto) + ' خلية | من Management: ' + fromMg + ' | تلقائي: ' + auto);
+  return fromMg + auto;
 }
 
 function doGet(e) {
