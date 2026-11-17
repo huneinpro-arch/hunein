@@ -329,6 +329,177 @@ function testSms() {
 }
 
 
+// ===== رسائل تتبع الشحنة: تُقرأ من ورقة Suivi وتُرسل حسب قواعد ورقة "SMS Rules" =====
+// تشغيلها يحتاج: SMS_TRACK_ENABLED = 1 في Script properties، وتشغيل baselineSmsTracking مرة واحدة،
+// ثم installSmsTrackingTrigger مرة واحدة (مؤقّت كل 10 دقائق).
+var TRACK_SHEET_ = 'Suivi';
+var RULES_SHEET_ = 'SMS Rules';
+var LOG_SHEET_ = 'SMS Log';
+var TRACK_MAX_PER_RUN_ = 20;   // أقصى عدد رسائل في كل دورة
+
+// القواعد الافتراضية: STATUT (الكلمة كما تكتبها DHD) | التوصيل | مفعّل | نص الرسالة
+// {id} رقم الطلب  {track} رقم التتبع  {amount} المبلغ عند الاستلام  {office} اسم المكتب  {commune} البلدية
+function trackRulesDefaults_() {
+  return [
+    ['STATUT', 'التوصيل', 'مفعّل', 'نص الرسالة'],
+    ['Drawn', 'الكل', 'نعم', 'حنين: تم شحن طلبك {id} مع DHD (تتبع: {track}). سيتصل بك الموزع قريبا، يرجى الرد على اتصاله وتجهيز المبلغ: {amount} دج.'],
+    ['En livraison', 'A domicile', 'لا', 'حنين: طلبك {id} مع الموزع اليوم. يرجى إبقاء هاتفك مفتوحا وتجهيز المبلغ: {amount} دج. شكرا لثقتك.'],
+    ['En Station', 'Stopdesk', 'لا', 'حنين: وصل طلبك {id} إلى مكتب DHD ({office}). يرجى استلامه في أقرب وقت ومعك بطاقة الهوية. المبلغ: {amount} دج.'],
+    ['Suspendus', 'الكل', 'لا', 'حنين: تعذّر تسليم طلبك {id}. يرجى الرد على اتصال الموزع أو زيارة المكتب قريبا لتفادي إرجاع الطلب.'],
+    ['Livre non encaissé', 'الكل', 'لا', 'حنين: تم تسليم طلبك {id}. شكرا لثقتك! لأي مساعدة تواصل معنا عبر واتساب.']
+  ];
+}
+
+function ssForTrack_() {
+  return SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SHEET_ID);
+}
+
+function sheetOrCreate_(ss, name, rows) {
+  var sh = ss.getSheetByName(name);
+  if (sh) return sh;
+  sh = ss.insertSheet(name);
+  if (rows && rows.length) sh.getRange(1, 1, rows.length, rows[0].length).setValues(rows);
+  return sh;
+}
+
+function colOf_(heads, names) {
+  for (var i = 0; i < names.length; i++) {
+    var at = heads.indexOf(names[i]);
+    if (at > -1) return at;
+  }
+  return -1;
+}
+
+function fmtMoney_(n) { return String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+function fillTpl_(tpl, v) {
+  return String(tpl).replace(/\{(\w+)\}/g, function (m, k) { return v.hasOwnProperty(k) ? v[k] : ''; });
+}
+
+// يقرأ ورقة Suivi ويعيد صفوف الطلبات الصالحة (رقم طلب + هاتف + حالة)
+function trackRows_(ss) {
+  var sh = ss.getSheetByName(TRACK_SHEET_);
+  if (!sh || sh.getLastRow() < 2) return [];
+  var last = sh.getLastRow(), cols = sh.getLastColumn();
+  var heads = sh.getRange(1, 1, 1, cols).getValues()[0].map(norm_);
+  var cId = colOf_(heads, ['orderid', 'code']), cPh = colOf_(heads, ['phone', 'الهاتف']), cSt = colOf_(heads, ['statut']);
+  var cTr = colOf_(heads, ['numerosuivi']), cTot = colOf_(heads, ['prixtotal', 'prixtota']);
+  var cDel = colOf_(heads, ['stopdesk']), cOff = colOf_(heads, ['nomstopdesk']), cCom = colOf_(heads, ['commune']);
+  if (cId < 0 || cPh < 0 || cSt < 0) return [];
+  var data = sh.getRange(2, 1, last - 1, cols).getValues(), out = [];
+  for (var i = 0; i < data.length; i++) {
+    var r = data[i], id = String(r[cId]).trim(), st = String(r[cSt]).trim();
+    if (!ORDER_RE_.test(id) || !st) continue;
+    var phone = local_(String(r[cPh]).split('/')[0]);
+    if (!PHONE_RE_.test(phone)) continue;
+    out.push({
+      id: id, statut: st, phone: phone,
+      track: cTr > -1 ? String(r[cTr]).trim() : '',
+      amount: cTot > -1 ? fmtMoney_(r[cTot]) : '',
+      del: cDel > -1 ? String(r[cDel]).trim().toLowerCase() : '',
+      office: cOff > -1 ? String(r[cOff]).trim() : '',
+      commune: cCom > -1 ? String(r[cCom]).trim() : ''
+    });
+  }
+  return out;
+}
+
+function trackRules_(ss) {
+  var sh = sheetOrCreate_(ss, RULES_SHEET_, trackRulesDefaults_());
+  if (sh.getLastRow() < 2) return [];
+  var v = sh.getRange(2, 1, sh.getLastRow() - 1, 4).getValues(), rules = [];
+  for (var i = 0; i < v.length; i++) {
+    var st = String(v[i][0]).trim().toLowerCase();
+    if (!st || String(v[i][2]).trim() !== 'نعم' || !String(v[i][3]).trim()) continue;
+    rules.push({ statut: st, del: String(v[i][1]).trim().toLowerCase(), text: String(v[i][3]) });
+  }
+  return rules;
+}
+
+function ruleFor_(rules, row) {
+  var st = row.statut.toLowerCase();
+  for (var i = 0; i < rules.length; i++) {
+    var r = rules[i];
+    if (r.statut === st && (r.del === 'الكل' || r.del === '' || r.del === row.del)) return r;
+  }
+  return null;
+}
+
+function trackDailyTake_(pr) {
+  var day = Utilities.formatDate(new Date(), 'Africa/Algiers', 'yyyy-MM-dd');
+  var cur = String(pr.getProperty('SMS_DAY') || '').split(':');
+  var n = cur[0] === day ? Number(cur[1]) || 0 : 0;
+  if (n >= SMS_DAILY_MAX_) return false;
+  pr.setProperty('SMS_DAY', day + ':' + (n + 1));
+  return true;
+}
+
+function sendSmsRaw_(phone, text) {
+  var res = UrlFetchApp.fetch(SMS_API_ + '/messages', {
+    method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+    headers: { Authorization: smsAuth_() },
+    payload: JSON.stringify({ textMessage: { text: text }, phoneNumbers: [intl_(phone)] })
+  });
+  return res.getResponseCode();
+}
+
+// baseline=true: يسجّل الوضع الحالي كأنه "تمّ" دون إرسال أي شيء (حتى لا تصل رسائل لطلبات قديمة)
+function trackPass_(baseline) {
+  var ss = ssForTrack_(), pr = PropertiesService.getScriptProperties();
+  var rows = trackRows_(ss), rules = trackRules_(ss);   // تُنشئ ورقة القواعد عند أول تشغيل
+  var log = sheetOrCreate_(ss, LOG_SHEET_, [['مفتاح', 'وقت', 'رقم الطلب', 'STATUT', 'الهاتف', 'النتيجة']]);
+  var seen = {};
+  if (log.getLastRow() > 1) {
+    log.getRange(2, 1, log.getLastRow() - 1, 1).getValues().forEach(function (x) { seen[String(x[0])] = 1; });
+  }
+  var now = Utilities.formatDate(new Date(), 'Africa/Algiers', 'yyyy-MM-dd HH:mm'), added = [], sent = 0;
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i], key = r.id + '|' + r.statut.toLowerCase();
+    if (seen[key]) continue;
+    if (baseline) { seen[key] = 1; added.push([key, now, r.id, r.statut, r.phone, 'baseline']); continue; }
+    var rule = ruleFor_(rules, r);
+    if (!rule) continue;
+    if (sent >= TRACK_MAX_PER_RUN_ || !trackDailyTake_(pr)) break;
+    var text = fillTpl_(rule.text, { id: r.id, track: r.track, amount: r.amount, office: r.office, commune: r.commune });
+    var code = sendSmsRaw_(r.phone, text);
+    if (code >= 200 && code < 300) { seen[key] = 1; sent++; added.push([key, now, r.id, r.statut, r.phone, 'sent ' + code]); }
+    else { Logger.log('track sms failed ' + r.id + ' -> ' + code); break; }   // يُعاد المحاولة في الدورة القادمة
+  }
+  if (added.length) log.getRange(log.getLastRow() + 1, 1, added.length, 6).setValues(added);
+  return baseline ? 'baseline:' + added.length : 'sent:' + sent;
+}
+
+// تُشغَّل من المؤقّت كل 10 دقائق
+function runSmsTracking() {
+  var pr = PropertiesService.getScriptProperties();
+  if (pr.getProperty('SMS_TRACK_ENABLED') !== '1') return 'off';
+  if (pr.getProperty('SMS_TRACK_BASELINE') !== '1') return 'no-baseline';
+  if (!smsAuth_()) return 'no-auth';
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(5000)) return 'busy';
+  try { return trackPass_(false); } finally { lock.releaseLock(); }
+}
+
+// تُشغَّل مرة واحدة يدوياً قبل التفعيل: تُنشئ ورقتي "SMS Rules" و"SMS Log" وتسجّل الوضع الحالي بلا إرسال
+function baselineSmsTracking() {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    var out = trackPass_(true);
+    PropertiesService.getScriptProperties().setProperty('SMS_TRACK_BASELINE', '1');
+    Logger.log(out);
+    return out;
+  } finally { lock.releaseLock(); }
+}
+
+// تُشغَّل مرة واحدة: تنشئ مؤقّتاً كل 10 دقائق
+function installSmsTrackingTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'runSmsTracking') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('runSmsTracking').timeBased().everyMinutes(10).create();
+}
+
 function doGet() {
   return ContentService.createTextOutput('الخدمة تعمل');
 }
