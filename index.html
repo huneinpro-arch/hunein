@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>حقيبة المهندس | حنين Hunein — دورات الهندسة المدنية مسجلة في فلاشة</title>
 <meta name="description" content="Robot Structural Analysis، AutoCAD Structural Detailing، Charpente Métallique، AutoCAD —دورات تطبيقية مسجلة في فلاشة، من إعداد الأستاذ أمين بنقالة. توصيل لكل الولايات.">
-<meta name="theme-color" content="#050c29">
+<meta name="theme-color" content="#030a24">
 <link rel="preconnect" href="https://script.google.com"><link rel="preconnect" href="https://script.googleusercontent.com"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 <style>
@@ -305,6 +305,95 @@ h2 em,h1 em{display:inline-block;padding:0 .04em .16em;margin-bottom:-.16em;back
 .wan{display:flex;gap:10px;align-items:flex-start;background:linear-gradient(135deg,rgba(37,211,102,.16),rgba(37,211,102,.06));border:1px solid rgba(37,211,102,.55);border-radius:14px;padding:10px 14px;color:#d8ffe6;font-weight:700;font-size:14px;line-height:1.6}
 .wan i{font-style:normal;font-size:18px;line-height:1.4}
 @media(prefers-reduced-motion:reduce){.bp,.bp:after{animation:none!important}}
+
+/* ===== Theme v3 — Blueprint (هوية هندسية): أزرق مخطّطات + سماوي + ذهبي أمان للزر ===== */
+:root{--gr:#3ddcff;--gr2:#19a7e6;--bp1:#ffd24a;--bp2:#ff9f0a;--cy:61,220,255}
+body{background:radial-gradient(1000px 560px at 85% -8%,rgba(47,128,255,.34),transparent 62%),radial-gradient(800px 480px at -5% 28%,rgba(var(--cy),.09),transparent 62%),#030a24}
+.ann{background:linear-gradient(90deg,#0b3fd0 0%,#2f80ff 55%,#19a7e6 100%)}
+header{border-image:linear-gradient(90deg,transparent,rgba(47,128,255,.6),rgba(var(--cy),.55),transparent) 1;transition:box-shadow .3s}
+header.sc{box-shadow:0 10px 34px rgba(0,0,0,.45)}
+.nav{transition:min-height .3s}header.sc .nav{min-height:56px}
+.brand span{color:var(--am)}
+h2 em,h1 em{background:linear-gradient(90deg,#3ddcff,#a6ecff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .by b,.chip b{color:#6fe6ff}
+.ab li:before{color:#3ddcff}
+
+/* الزر الرئيسي: ذهبي أمان — يبرز فوق الأزرق (لونان متكاملان) */
+.bp,.sbt{background:linear-gradient(135deg,var(--bp1),var(--bp2));color:#1d1200;box-shadow:0 12px 34px rgba(255,159,10,.38),inset 0 1px 0 rgba(255,255,255,.45)}
+.bp{animation:cta2 2.8s ease-in-out infinite}
+@keyframes cta2{50%{box-shadow:0 12px 46px rgba(255,159,10,.62),inset 0 1px 0 rgba(255,255,255,.45)}}
+.sbt{box-shadow:0 14px 34px rgba(255,159,10,.4),inset 0 1px 0 rgba(255,255,255,.45)}
+.tab.on,.lg button.on{background:linear-gradient(135deg,var(--bp1),var(--bp2));color:#1d1200}
+.apb{background:linear-gradient(135deg,var(--bp1),var(--bp2));color:#1d1200;box-shadow:0 10px 24px rgba(255,159,10,.32)}
+.stp a.on{border-color:rgba(255,191,31,.7);background:rgba(255,191,31,.1)}.stp a.on b{background:var(--am);color:#1d1200}
+.op.on{border-color:#3ddcff;background:rgba(var(--cy),.08);box-shadow:0 0 0 3px rgba(var(--cy),.12)}
+.op.on .bx{background:#3ddcff;border-color:#3ddcff;color:#02222c}
+.op[role=button].on:after{background:#3ddcff;border-color:#3ddcff}
+.card.hot{background:linear-gradient(150deg,rgba(255,191,31,.16),rgba(var(--cy),.06) 55%,rgba(3,10,36,.98))}
+.tier.ok{background:rgba(var(--cy),.08);border-color:rgba(var(--cy),.5);color:#d8f7ff}
+.up em,.tier em{background:#3ddcff;color:#02222c}
+details[open]{border-color:rgba(var(--cy),.45);background:rgba(var(--cy),.05)}
+.hv svg tspan{fill:#ffbf1f}.hv svg rect[fill="#39ee6b"]{fill:#ffbf1f}
+
+/* خلفية مخطّط هندسي (blueprint grid) */
+.hero{overflow:hidden;background:radial-gradient(760px 460px at 12% 0,rgba(47,128,255,.38),transparent 70%),radial-gradient(620px 420px at 100% 75%,rgba(var(--cy),.15),transparent 70%),radial-gradient(500px 300px at 60% 100%,rgba(255,191,31,.09),transparent 70%)}
+.hero::before,.alt::before,.fin::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(var(--cy),.07) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--cy),.07) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(ellipse at 50% 30%,#000 20%,transparent 75%);mask-image:radial-gradient(ellipse at 50% 30%,#000 20%,transparent 75%)}
+.alt::before,.fin::before{opacity:.55}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;background:radial-gradient(420px circle at var(--hx,70%) var(--hy,30%),rgba(var(--cy),.13),transparent 65%)}
+.hero>.c,.alt>.c,.fin>.c{position:relative;z-index:1}
+.truss{position:absolute;inset-inline-start:-30px;bottom:-14px;width:min(640px,72%);color:#3ddcff;opacity:.17;pointer-events:none;z-index:0;fill:none;stroke:currentColor;stroke-width:1.4}
+.truss .d{stroke-dasharray:1;stroke-dashoffset:1;animation:dw 2.2s cubic-bezier(.4,0,.2,1) calc(.3s + var(--i)*.07s) forwards}
+.truss .n{fill:#ffbf1f;stroke:none;opacity:0;animation:nd 3.2s ease-in-out calc(1.6s + var(--i)*.15s) infinite}
+@keyframes dw{to{stroke-dashoffset:0}}@keyframes nd{0%,100%{opacity:.1}50%{opacity:.95}}
+@media(max-width:700px){.truss{opacity:.1;width:100%}}
+
+/* دخول عناصر الهيرو */
+@keyframes rise{from{opacity:0;transform:translateY(24px)}}
+.hero .pill,.hero h1,.hero .lead,.hero .by,.hero .hp,.hero .act,.hero .proof,.hero .soc,.hero .hv{animation:rise .85s cubic-bezier(.2,.7,.2,1) both}
+.hero .pill{animation-delay:.05s}.hero h1{animation-delay:.15s}.hero .lead{animation-delay:.28s}.hero .by{animation-delay:.36s}.hero .hp{animation-delay:.44s}.hero .act{animation-delay:.52s}.hero .proof{animation-delay:.6s}.hero .soc{animation-delay:.66s}.hero .hv{animation-delay:.25s}
+.chip{transition:transform .25s,border-color .25s}.chip:hover{transform:translateY(-3px);border-color:rgba(var(--cy),.6)}
+
+/* شريط التقدم */
+.prog{position:fixed;top:0;left:0;right:0;height:3px;z-index:90;transform-origin:100% 50%;transform:scaleX(var(--p,0));background:linear-gradient(90deg,#3ddcff,#ffbf1f);pointer-events:none}
+
+/* روابط التنقل */
+.links a{position:relative;padding:4px 0;transition:color .2s}
+.links a:after{content:"";position:absolute;right:0;left:0;bottom:-3px;height:2px;background:var(--am);transform:scaleX(0);transform-origin:100% 50%;transition:transform .3s}
+.links a:hover,.links a.act{color:#fff}.links a:hover:after,.links a.act:after{transform:scaleX(1)}
+
+/* خط القياس تحت العناوين */
+.sh h2:after{content:"";display:block;width:70px;height:3px;margin:14px auto 0;border-radius:3px;background:linear-gradient(90deg,transparent,var(--am),transparent);transform:scaleX(0);transition:transform .9s .35s cubic-bezier(.2,.7,.2,1)}
+.sh.in h2:after{transform:scaleX(1)}
+
+/* وهج يتبع المؤشر داخل البطاقات */
+.card,.tg>div,.fc,.mod,.bd,.aud{position:relative}
+.card:after,.tg>div:after,.fc:after,.mod:after,.bd:after,.aud:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),rgba(var(--cy),.15),transparent 65%);opacity:0;transition:opacity .3s}
+.card:hover:after,.tg>div:hover:after,.fc:hover:after,.mod:hover:after,.bd:hover:after,.aud:hover:after{opacity:1}
+.tg>div,.fc,.bd{transition:transform .3s,border-color .3s,box-shadow .3s}
+.tg>div:hover,.fc:hover,.bd:hover{transform:translateY(-4px);border-color:rgba(var(--cy),.55);box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.fc:hover .ic,.tg>div:hover .ic{border-color:var(--am)}
+.ic{transition:border-color .3s,transform .3s}.fc:hover .ic,.tg>div:hover .ic{transform:rotate(-6deg) scale(1.06)}
+
+/* دخول متدرّج للمجموعات */
+@keyframes pop{from{opacity:0;translate:0 20px}to{opacity:1;translate:0 0}}
+.js .st>*{opacity:0}
+.js .st.go>*{animation:pop .65s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*90ms);opacity:1}
+
+/* عمارات المشاريع تُبنى طابقاً طابقاً */
+.js .bl .tw i{opacity:0;transform:scaleX(.25);transform-origin:50% 100%}
+.js .bl.go .tw i{opacity:1;transform:none;transition:opacity .4s,transform .45s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--f,0)*80ms + .5s)}
+.bd .tw i{background:repeating-linear-gradient(90deg,transparent 0 9px,rgba(255,255,255,.28) 9px 12px),linear-gradient(90deg,var(--bl),#2260d6)}
+.bd .tw i:first-child{background:linear-gradient(90deg,var(--am),#ffa800)}
+.bd:hover b{color:var(--am)}.bd b{transition:color .25s}
+
+/* أسئلة شائعة */
+details[open] p{animation:fi .4s ease both}
+
+@media (prefers-reduced-motion:reduce){
+  .js .st>*{opacity:1}
+  .truss .d{stroke-dashoffset:0}.js .bl .tw i{opacity:1;transform:none}
+  .prog{display:none}
+}
 </style>
 </head>
 <body>
@@ -315,7 +404,7 @@ h2 em,h1 em{display:inline-block;padding:0 .04em .16em;margin-bottom:-.16em;back
 <div class="end"><div class="lg" id="lg" role="group" aria-label="Language"><i aria-hidden="true">🌐</i><button type="button" data-l="ar" title="العربية">Ar</button><button type="button" data-l="fr" title="Français">Fr</button><button type="button" data-l="en" title="English">En</button></div><a class="btn bp" href="#order">اطلب الآن</a></div></div></header>
 
 <main id="top">
-<section class="hero"><div class="c hg">
+<section class="hero"><svg class="truss" viewBox="0 0 640 420" aria-hidden="true" focusable="false"><path class="d" pathLength="1" style="--i:0" d="M20 400H620"/><path class="d" pathLength="1" style="--i:1" d="M80 400V40"/><path class="d" pathLength="1" style="--i:2" d="M300 400V40"/><path class="d" pathLength="1" style="--i:3" d="M520 400V40"/><path class="d" pathLength="1" style="--i:4" d="M80 40H520"/><path class="d" pathLength="1" style="--i:5" d="M80 130H520"/><path class="d" pathLength="1" style="--i:6" d="M80 220H520"/><path class="d" pathLength="1" style="--i:7" d="M80 310H520"/><path class="d" pathLength="1" style="--i:8" d="M80 400L300 310"/><path class="d" pathLength="1" style="--i:9" d="M300 400L80 310"/><path class="d" pathLength="1" style="--i:10" d="M300 400L520 310"/><path class="d" pathLength="1" style="--i:11" d="M520 400L300 310"/><path class="d" pathLength="1" style="--i:12" d="M80 310L300 220"/><path class="d" pathLength="1" style="--i:13" d="M520 310L300 220"/><path class="d" pathLength="1" style="--i:14" d="M300 220L80 130"/><path class="d" pathLength="1" style="--i:15" d="M300 220L520 130"/><path class="d" pathLength="1" style="--i:16" d="M80 40L300 130"/><path class="d" pathLength="1" style="--i:17" d="M520 40L300 130"/><circle class="n" style="--i:0" cx="80" cy="40" r="4"/><circle class="n" style="--i:1" cx="80" cy="130" r="4"/><circle class="n" style="--i:2" cx="80" cy="220" r="4"/><circle class="n" style="--i:3" cx="80" cy="310" r="4"/><circle class="n" style="--i:4" cx="80" cy="400" r="4"/><circle class="n" style="--i:5" cx="300" cy="40" r="4"/><circle class="n" style="--i:6" cx="300" cy="130" r="4"/><circle class="n" style="--i:7" cx="300" cy="220" r="4"/><circle class="n" style="--i:8" cx="300" cy="310" r="4"/><circle class="n" style="--i:9" cx="300" cy="400" r="4"/><circle class="n" style="--i:10" cx="520" cy="40" r="4"/><circle class="n" style="--i:11" cx="520" cy="130" r="4"/><circle class="n" style="--i:12" cx="520" cy="220" r="4"/><circle class="n" style="--i:13" cx="520" cy="310" r="4"/><circle class="n" style="--i:14" cx="520" cy="400" r="4"/></svg><div class="c hg">
 <div>
 <span class="pill">💾 دورات تطبيقية مسجلة في فلاشة</span>
 <h1>حقيبة <em>المهندس</em><br>من الصفر إلى الاحتراف</h1>
@@ -1036,6 +1125,75 @@ document.addEventListener('click',function(e){var b=e.target.closest('#lg button
 var s0='ar';try{s0=localStorage.getItem('hn_lang')||(/^fr/i.test(navigator.language)?'ar':'ar')}catch(e){}
 if(s0!='ar')setLang(s0);else setLang('ar');
 })();
+</script>
+<script>
+/* ===== Hunein v3: حركات وتفاعل (طبقة تجميلية فقط، لا تمس منطق الطلب) ===== */
+(function(){try{
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var canHover=window.matchMedia&&window.matchMedia('(hover: hover)').matches;
+  var Q=function(s,r){return (r||document).querySelector(s)},QA=function(s,r){return [].slice.call((r||document).querySelectorAll(s))};
+  var hasIO='IntersectionObserver' in window;
+
+  /* مجموعات تدخل بتدرّج */
+  var groups=QA('.tg,.fl,.nums,.bl');
+  groups.forEach(function(g){
+    g.classList.add('st');
+    [].forEach.call(g.children,function(c,i){c.style.setProperty('--i',i)});
+    if(g.classList.contains('bl'))QA('.tw',g).forEach(function(tw){[].forEach.call(tw.children,function(f,i){f.style.setProperty('--f',i)})});
+  });
+  if(hasIO&&!reduce){
+    var go=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('go');go.unobserve(e.target)}})},{threshold:.15});
+    groups.forEach(function(g){go.observe(g)});
+  }else groups.forEach(function(g){g.classList.add('go')});
+
+  /* عدّادات */
+  function ease(t){return 1-Math.pow(1-t,3)}
+  function counter(el,from,to,dur,fmt){
+    var t0=null;
+    function step(t){if(t0===null)t0=t;var p=Math.min((t-t0)/dur,1);el(fmt(Math.round(from+(to-from)*ease(p))));if(p<1)requestAnimationFrame(step)}
+    if(reduce){el(fmt(to));return}
+    el(fmt(from));requestAnimationFrame(step);
+  }
+  function onView(node,fn,th){
+    if(!hasIO){fn();return}
+    var o=new IntersectionObserver(function(es){if(es[0].isIntersecting){o.disconnect();fn()}},{threshold:th||.6});o.observe(node);
+  }
+  /* السعر في الهيرو: ينزل من 8,000 إلى 5,000 */
+  var hp=Q('.hp strong');
+  if(hp&&hp.firstChild&&hp.firstChild.nodeType===3){
+    var tn=hp.firstChild,to=parseInt(tn.nodeValue.replace(/[^\d]/g,''),10);
+    if(to){tn.nodeValue=(8000).toLocaleString('en')+' ';
+      onView(hp,function(){counter(function(v){tn.nodeValue=v},8000,to,1500,function(n){return n.toLocaleString('en')+' '})},.5)}
+  }
+  /* أرقام الأستاذ: 11 / 4 / 58 */
+  QA('.nums b').forEach(function(b){
+    var to=parseInt(b.textContent,10);if(!to)return;
+    b.textContent='0';
+    onView(b,function(){counter(function(v){b.textContent=v},0,to,1300,String)},.6);
+  });
+
+  /* شريط التقدّم + تصغير الهيدر + بارالاكس خفيف */
+  var bar=document.createElement('div');bar.className='prog';document.body.appendChild(bar);
+  var hd=Q('header'),tick=false;
+  function sc(){var y=window.pageYOffset,h=document.documentElement.scrollHeight-window.innerHeight;
+    bar.style.setProperty('--p',h>0?Math.min(y/h,1):0);if(hd)hd.classList.toggle('sc',y>24);tick=false}
+  window.addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(sc)}},{passive:true});sc();
+
+  /* رابط القسم الحالي */
+  var links=QA('.links a'),secs=links.map(function(a){return Q(a.getAttribute('href'))});
+  if(hasIO){var so=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)links.forEach(function(a){a.classList.toggle('act',a.getAttribute('href')==='#'+e.target.id)})})},{rootMargin:'-45% 0px -50% 0px'});
+    secs.forEach(function(s){if(s)so.observe(s)})}
+
+  /* وهج يتبع المؤشر (أجهزة الماوس فقط) */
+  if(canHover&&!reduce){
+    var hero=Q('.hero');
+    document.addEventListener('pointermove',function(e){
+      var c=e.target.closest&&e.target.closest('.card,.tg>div,.fc,.mod,.bd,.aud');
+      if(c){var r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px')}
+      if(hero){var h=hero.getBoundingClientRect();if(e.clientY>=h.top&&e.clientY<=h.bottom){hero.style.setProperty('--hx',(e.clientX-h.left)+'px');hero.style.setProperty('--hy',(e.clientY-h.top)+'px')}}
+    },{passive:true});
+  }
+}catch(err){}})();
 </script>
 <script>if(!window.__ok)document.documentElement.classList.remove('js');</script>
 </body>
