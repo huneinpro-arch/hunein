@@ -780,8 +780,51 @@ function applyCommuneFixes() {
   return fromMg + auto;
 }
 
+// ===== إحصائيات الشراء (للعرض على الموقع: عدد الطلبة لكل دورة + الأكثر مبيعاً) =====
+// تُرجع أعداداً مجمّعة فقط (بدون أسماء ولا هواتف). تُحسب من جدول الطلبات الحقيقي وتُخزَّن 10 دقائق.
+var STATS_EXCLUDE_ = /ملغ|إلغاء|الغاء|مرتجع|راجع|رفض|ردّ بـ 0|annul|cancel|retour|return|refus/i;
+function hasTok_(t, code) { return new RegExp('(^|[^A-Za-z])' + code + '([^A-Za-z]|$)').test(t); }
+// يحوّل نص الدورات (مثل: "Robot Structural Analysis + AutoCAD ...") إلى رموز الدورات الموجودة فيه
+function courseIds_(s) {
+  var ids = {};
+  String(s || '').split('+').forEach(function (t) {
+    t = String(t).trim();
+    if (!t) return;
+    if (/robot/i.test(t) || hasTok_(t, 'RB')) ids.rsa = 1;
+    else if (/detailing/i.test(t) || hasTok_(t, 'ASD')) ids.acd = 1;
+    else if (/charpente|hangar|hanger/i.test(t) || hasTok_(t, 'CM')) ids.cmh = 1;
+    else if (/autocad|dessin|رسم/i.test(t) || hasTok_(t, 'ATCD')) ids.cad = 1;
+  });
+  return Object.keys(ids);
+}
+function statsJson_() {
+  var cache = CacheService.getScriptCache(), hit = cache.get('stats_v1');
+  if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+  var out = { ok: 1, total: 0, c: { rsa: 0, acd: 0, cmh: 0, cad: 0 }, t: Date.now() };
+  var sh = getSheet_(), last = sh.getLastRow();
+  if (last >= 2) {
+    var heads = headsOf_(sh);
+    var col = function (names) { for (var i = 0; i < names.length; i++) { var k = heads.indexOf(names[i]); if (k > -1) return k; } return -1; };
+    var ci = col(['items', 'الدورات']), cp = col(['product', 'الدورة', 'المنتج']),
+        cs = col(['status', 'الحالة']), cn = col(['name', 'الاسم']);
+    var data = sh.getRange(2, 1, last - 1, sh.getLastColumn()).getValues();
+    data.forEach(function (r) {
+      var st = cs > -1 ? String(r[cs]) : '', nm = cn > -1 ? String(r[cn]) : '';
+      if (STATS_EXCLUDE_.test(st) || /تجريب/.test(nm)) return;           // ملغى/مرتجع/طلب تجريبي لا يُحتسب
+      var ids = courseIds_((ci > -1 && r[ci]) ? r[ci] : (cp > -1 ? r[cp] : ''));
+      if (!ids.length) return;
+      out.total++;
+      ids.forEach(function (id) { out.c[id]++; });
+    });
+  }
+  var js = JSON.stringify(out);
+  cache.put('stats_v1', js, 600);
+  return ContentService.createTextOutput(js).setMimeType(ContentService.MimeType.JSON);
+}
+
 function doGet(e) {
   if (e && e.parameter && e.parameter.dhdcommunes === '1') return dhdCommunesJson_();
+  if (e && e.parameter && e.parameter.stats === '1') return statsJson_();
   return ContentService.createTextOutput('الخدمة تعمل');
 }
 

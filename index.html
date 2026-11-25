@@ -394,6 +394,18 @@ details[open] p{animation:fi .4s ease both}
   .truss .d{stroke-dashoffset:0}.js .bl .tw i{opacity:1;transform:none}
   .prog{display:none}
 }
+
+/* ===== إحصائيات الشراء (العدد + النسبة + الأكثر مبيعاً) ===== */
+.buy{display:grid;gap:7px;padding:10px 13px;border-radius:14px;background:rgba(255,194,26,.08);border:1px solid rgba(255,194,26,.28)}
+.buy .r{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13.5px;font-weight:700;color:var(--am2)}
+.buy .pc{color:#fff;font-weight:900}
+.buy .bar{height:6px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.buy .bar i{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--am),#ff9f0a);transition:width 1.2s cubic-bezier(.2,.7,.2,1) .3s}
+.buy.go .bar i{width:var(--w,0%)}
+.card.bestc{border-color:var(--am);box-shadow:0 22px 56px rgba(255,159,10,.18)}
+.bs1{margin-top:14px;padding:12px 16px;border-radius:18px;background:linear-gradient(135deg,rgba(255,194,26,.14),rgba(47,128,255,.08));border:1px solid rgba(255,194,26,.4);color:#ffe9a8;font-weight:700;font-size:14.5px;line-height:1.7;width:fit-content;max-width:100%}
+.bs1[hidden]{display:none}.bs1 .k{display:block;color:var(--am2);font-size:12.5px;font-weight:800}
+.bs1 .v{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px}.bs1 em{font-style:normal;color:#fff;font-weight:900;font-size:16px}
 </style>
 </head>
 <body>
@@ -413,6 +425,7 @@ details[open] p{animation:fi .4s ease both}
 <div class="hp"><small>ابتداءً من</small><strong>5,000 <i>دج</i></strong><small>للدورة · أو وفّر أكثر مع الحقائب</small></div>
 <div class="act"><a class="btn bp" href="#order">🛒 اطلب الآن</a><a class="btn bs" href="#courses">شاهد الدورات والحقائب</a></div>
 <a class="proof" href="#fb">⭐ اسمع آراء عملائنا الحقيقية <span>↓</span></a>
+<div class="bs1" id="bs1" hidden></div>
 <div class="soc" id="soc1"></div>
 </div>
 <div class="hv"><div class="glow"></div>
@@ -913,7 +926,9 @@ var D=[
 ["حنين","Hunein","Hunein"],
 ["الدورات","Cours","Courses"],["الأستاذ","Formateur","Instructor"],["الآراء","Avis","Reviews"],["المحتوى","Contenu","Content"],["المتابعة","Suivi","Support"],["الأسئلة","Questions","FAQ"],
 ["اكتب الاسم واللقب","Saisissez votre nom et prénom","Enter your full name"],["مثال: 06xxxxxxxx","Ex. : 06xxxxxxxx","e.g. 06xxxxxxxx"],["رقم احتياطي","Numéro de secours","Backup number"],["اكتب اسم بلديتك","Saisissez le nom de votre commune","Type your commune name"],
-["اطلب الآن","Commander","Order now"],["🛒 اطلب الآن","🛒 Commander","🛒 Order now"],
+["اطلب الآن","Commander","Order now"],["🔥 الأكثر مبيعاً","🔥 Meilleure vente","🔥 Best seller"],["الدورة الأكثر مبيعاً","Formation la plus vendue","Best-selling course"],
+["طلبها {0} طالب","Commandée par {0} étudiants","Ordered by {0} students"],["{0}% من الطلبات","{0}% des commandes","{0}% of orders"],["{0} طلب مسجّل","{0} commandes enregistrées","{0} orders placed"],
+["🛒 اطلب الآن","🛒 Commander","🛒 Order now"],
 ["💾 دورات تطبيقية مسجلة في فلاشة","💾 Formations pratiques enregistrées sur clé USB","💾 Hands-on recorded courses on a USB drive"],
 ["حقيبة","Le pack de l’","The"],["المهندس","ingénieur","Engineer’s Pack"],["من الصفر إلى الاحتراف","de zéro à l’expertise","from zero to pro"],
 ["Robot Structural Analysis • AutoCAD Structural Detailing • Charpente Métallique • AutoCAD.دورات مشروحة باللهجة الجزائرية، بمشاريع حقيقية منجزة، تصلك إلى باب بيتك.","Robot Structural Analysis • AutoCAD Structural Detailing • Charpente Métallique • AutoCAD. Des formations expliquées en dialecte algérien, avec de vrais projets réalisés, livrées jusqu’à votre porte.","Robot Structural Analysis • AutoCAD Structural Detailing • Charpente Métallique • AutoCAD. Courses explained in Algerian dialect, with real completed projects, delivered to your door."],
@@ -1125,6 +1140,56 @@ document.addEventListener('click',function(e){var b=e.target.closest('#lg button
 var s0='ar';try{s0=localStorage.getItem('hn_lang')||(/^fr/i.test(navigator.language)?'ar':'ar')}catch(e){}
 if(s0!='ar')setLang(s0);else setLang('ar');
 })();
+</script>
+<script>
+/* ===== إحصائيات الشراء: تُجلب من Google Sheet (أعداد مجمّعة فقط) وتُعرض حين يتوفّر العدد الكافي ===== */
+(function(){try{
+  var URL='https://script.google.com/macros/s/AKfycbzNR9VjoDsoEdvt6erg0DQ1p9np2KMuqsWcPHM3xocvfG3xG0HvH8CCvbpKC6wxUOU6/exec?stats=1';
+  var MIN=5;                       /* أقل عدد طلبات لإظهار إحصائية دورة (لا تُعرض أرقام صغيرة) */
+  var NAME={rsa:'Robot Structural Analysis',acd:'AutoCAD Structural Detailing',cmh:'Charpente Métallique de Hangar',cad:'AutoCAD — Dessin des plans génie civil'};
+  var IDS=Object.keys(NAME),$=function(i){return document.getElementById(i)},fm=function(n){return Number(n).toLocaleString('en')};
+  var DATA=null;
+  function calc(d){
+    var tot=d.total||0,c={};IDS.forEach(function(k){c[k]=(d.c&&d.c[k])||0});
+    var arr=IDS.slice().sort(function(a,b){return c[b]-c[a]});
+    return {tot:tot,by:c,pct:function(k){return tot>0?Math.min(100,Math.round(c[k]/tot*100)):0},
+      best:(c[arr[0]]>=MIN&&c[arr[0]]>c[arr[1]])?arr[0]:null};
+  }
+  function apply(){
+    if(!DATA)return;var R=calc(DATA);
+    IDS.forEach(function(id){
+      var b=document.querySelector('#singles [data-p="'+id+'"]');if(!b)return;var card=b.closest('.card');if(!card)return;
+      [].forEach.call(card.querySelectorAll('.buy,.rb.bsl'),function(x){x.remove()});card.classList.remove('bestc');
+      var n=R.by[id];if(n<MIN)return;
+      var el=document.createElement('div');el.className='buy';
+      el.innerHTML='<div class="r"><span>👥</span><span>طلبها '+fm(n)+' طالب</span><span class="pc">'+R.pct(id)+'% من الطلبات</span></div><div class="bar"><i style="--w:'+R.pct(id)+'%"></i></div>';
+      card.insertBefore(el,card.querySelector('.pr'));
+      if(R.best===id){card.classList.add('bestc');var rb=document.createElement('span');rb.className='rb bsl';rb.textContent='🔥 الأكثر مبيعاً';card.insertBefore(rb,card.firstChild)}
+      requestAnimationFrame(function(){requestAnimationFrame(function(){el.classList.add('go')})});
+    });
+    [].forEach.call(document.querySelectorAll('#pl .op[data-sp]'),function(op){
+      var id=op.dataset.sp,sm=op.querySelector('.tx small');if(!sm||op.querySelector('.bdg'))return;var n=R.by[id];if(n<MIN)return;
+      var sp=document.createElement('span'),isb=R.best===id;sp.className='bdg '+(isb?'a':'b');sp.textContent=isb?'🔥 الأكثر مبيعاً':R.pct(id)+'% من الطلبات';sm.appendChild(sp);
+    });
+    var h=$('bs1');if(h){
+      if(R.best&&R.tot>=MIN*2){
+        h.innerHTML='<span class="k"><span>🏆</span> <span>الدورة الأكثر مبيعاً</span></span><div class="v"><em>'+NAME[R.best]+'</em><span>طلبها '+fm(R.by[R.best])+' طالب</span><span>'+R.pct(R.best)+'% من الطلبات</span><span>'+fm(R.tot)+' طلب مسجّل</span></div>';
+        h.hidden=false;
+      }else h.hidden=true;
+    }
+  }
+  function load(){
+    var c=null;try{c=JSON.parse(localStorage.getItem('hn_stats')||'null')}catch(e){}
+    if(c&&c.d&&Date.now()-c.t<9e5){DATA=c.d;apply();return}
+    var ac=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(ac)ac.abort()},7000);
+    fetch(URL,ac?{signal:ac.signal}:{}).then(function(r){return r.json()}).then(function(d){
+      clearTimeout(tm);if(!d||!d.ok||!d.c)return;DATA=d;
+      try{localStorage.setItem('hn_stats',JSON.stringify({t:Date.now(),d:d}))}catch(e){}apply();
+    }).catch(function(){});
+  }
+  var pl=$('pl');if(pl&&window.MutationObserver)new MutationObserver(apply).observe(pl,{childList:true});
+  load();
+}catch(err){}})();
 </script>
 <script>
 /* ===== Hunein v3: حركات وتفاعل (طبقة تجميلية فقط، لا تمس منطق الطلب) ===== */
