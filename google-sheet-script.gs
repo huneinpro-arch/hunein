@@ -798,9 +798,9 @@ function courseIds_(s) {
   return Object.keys(ids);
 }
 function statsJson_() {
-  var cache = CacheService.getScriptCache(), hit = cache.get('stats_v1');
+  var cache = CacheService.getScriptCache(), hit = cache.get('stats_v2');
   if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
-  var out = { ok: 1, total: 0, c: { rsa: 0, acd: 0, cmh: 0, cad: 0 }, t: Date.now() };
+  var out = { ok: 1, total: 0, c: { rsa: 0, acd: 0, cmh: 0, cad: 0 }, k: { 1: 0, 2: 0, 3: 0, 4: 0 }, t: Date.now() };
   var sh = getSheet_(), last = sh.getLastRow();
   if (last >= 2) {
     var heads = headsOf_(sh);
@@ -814,11 +814,12 @@ function statsJson_() {
       var ids = courseIds_((ci > -1 && r[ci]) ? r[ci] : (cp > -1 ? r[cp] : ''));
       if (!ids.length) return;
       out.total++;
+      out.k[Math.min(ids.length, 4)]++;
       ids.forEach(function (id) { out.c[id]++; });
     });
   }
   var js = JSON.stringify(out);
-  cache.put('stats_v1', js, 600);
+  cache.put('stats_v2', js, 600);
   return ContentService.createTextOutput(js).setMimeType(ContentService.MimeType.JSON);
 }
 

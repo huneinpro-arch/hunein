@@ -449,6 +449,7 @@ details[open] p{animation:fi .4s ease both}
 <section class="alt" id="courses"><div class="c">
 <div class="sh rv"><span class="kick">الدورات والحقائب</span><h2>اختر دوراتك بنفسك <em>ووفّر أكثر</em></h2><p>اختر الدورات اللي تحتاجها: دورتان = حقيبة المهندس، 3 دورات = حقيبة المهندس برو، والدورات الأربع = حقيبة المهندس PROMAX.</p></div>
 <div class="g3" id="packs"></div>
+<div class="bs1 kst" id="kst" hidden></div>
 <div class="sub3" style="margin-top:44px">الدورات المتوفرة — 5,000 دج للدورة</div>
 <div class="g2" id="singles"></div>
 </div></section>
@@ -927,7 +928,7 @@ var D=[
 ["الدورات","Cours","Courses"],["الأستاذ","Formateur","Instructor"],["الآراء","Avis","Reviews"],["المحتوى","Contenu","Content"],["المتابعة","Suivi","Support"],["الأسئلة","Questions","FAQ"],
 ["اكتب الاسم واللقب","Saisissez votre nom et prénom","Enter your full name"],["مثال: 06xxxxxxxx","Ex. : 06xxxxxxxx","e.g. 06xxxxxxxx"],["رقم احتياطي","Numéro de secours","Backup number"],["اكتب اسم بلديتك","Saisissez le nom de votre commune","Type your commune name"],
 ["اطلب الآن","Commander","Order now"],["🔥 الأكثر مبيعاً","🔥 Meilleure vente","🔥 Best seller"],["الدورة الأكثر مبيعاً","Formation la plus vendue","Best-selling course"],
-["طلبها {0} طالب","Commandée par {0} étudiants","Ordered by {0} students"],["{0}% من الطلبات","{0}% des commandes","{0}% of orders"],["{0} طلب مسجّل","{0} commandes enregistrées","{0} orders placed"],
+["طلبها {0} طالب","Commandée par {0} étudiants","Ordered by {0} students"],["{0}% من الطلبات","{0}% des commandes","{0}% of orders"],["{0} طلب مسجّل","{0} commandes enregistrées","{0} orders placed"],["اختارها {0} طالب","Choisi par {0} étudiants","Chosen by {0} students"],["🔥 الأكثر طلباً","🔥 Le plus demandé","🔥 Most ordered"],["☝️ الدورة وحدها","☝️ Un seul cours","☝️ Single course"],["{0} طلب","{0} commandes","{0} orders"],["توزيع الطلبات حسب العرض","Répartition des commandes par offre","Orders by offer"],
 ["🛒 اطلب الآن","🛒 Commander","🛒 Order now"],
 ["💾 دورات تطبيقية مسجلة في فلاشة","💾 Formations pratiques enregistrées sur clé USB","💾 Hands-on recorded courses on a USB drive"],
 ["حقيبة","Le pack de l’","The"],["المهندس","ingénieur","Engineer’s Pack"],["من الصفر إلى الاحتراف","de zéro à l’expertise","from zero to pro"],
@@ -1152,7 +1153,8 @@ if(s0!='ar')setLang(s0);else setLang('ar');
   function calc(d){
     var tot=d.total||0,c={};IDS.forEach(function(k){c[k]=(d.c&&d.c[k])||0});
     var arr=IDS.slice().sort(function(a,b){return c[b]-c[a]});
-    return {tot:tot,by:c,pct:function(k){return tot>0?Math.min(100,Math.round(c[k]/tot*100)):0},
+    var K=d.k||{},kc={1:+K[1]||0,2:+K[2]||0,3:+K[3]||0,4:+K[4]||0},ks=[4,3,2,1].sort(function(a,b){return kc[b]-kc[a]});
+    return {tot:tot,by:c,kc:kc,kpct:function(k){return tot>0?Math.min(100,Math.round(kc[k]/tot*100)):0},kbest:(kc[ks[0]]>=MIN&&kc[ks[0]]>kc[ks[1]])?ks[0]:null,pct:function(k){return tot>0?Math.min(100,Math.round(c[k]/tot*100)):0},
       best:(c[arr[0]]>=MIN&&c[arr[0]]>c[arr[1]])?arr[0]:null};
   }
   function apply(){
@@ -1167,6 +1169,21 @@ if(s0!='ar')setLang(s0);else setLang('ar');
       if(R.best===id){card.classList.add('bestc');var rb=document.createElement('span');rb.className='rb bsl';rb.textContent='🔥 الأكثر مبيعاً';card.insertBefore(rb,card.firstChild)}
       requestAnimationFrame(function(){requestAnimationFrame(function(){el.classList.add('go')})});
     });
+    [2,3,4].forEach(function(k){
+      var b=document.querySelector('#packs [data-k="'+k+'"]');if(!b)return;var card=b.closest('.card');if(!card)return;
+      [].forEach.call(card.querySelectorAll('.buy,.rb.bsl'),function(x){x.remove()});card.classList.remove('bestc');
+      var n=R.kc[k];if(n<MIN)return;
+      var el=document.createElement('div');el.className='buy';
+      el.innerHTML='<div class="r"><span>👥</span><span>اختارها '+fm(n)+' طالب</span><span class="pc">'+R.kpct(k)+'% من الطلبات</span></div><div class="bar"><i style="--w:'+R.kpct(k)+'%"></i></div>';
+      card.insertBefore(el,card.querySelector('.pr'));
+      if(R.kbest===k){card.classList.add('bestc');if(!card.querySelector('.rb')){var rb=document.createElement('span');rb.className='rb bsl';rb.textContent='🔥 الأكثر طلباً';card.insertBefore(rb,card.firstChild)}}
+      requestAnimationFrame(function(){requestAnimationFrame(function(){el.classList.add('go')})});
+    });
+    var ks=$('kst');if(ks){
+      if(R.kc[1]>=MIN){
+        ks.innerHTML='<span class="k"><span>☝️ الدورة وحدها</span></span><div class="v"><span>'+fm(R.kc[1])+' طلب</span><span>'+R.kpct(1)+'% من الطلبات</span></div>';ks.hidden=false;
+      }else ks.hidden=true;
+    }
     [].forEach.call(document.querySelectorAll('#pl .op[data-sp]'),function(op){
       var id=op.dataset.sp,sm=op.querySelector('.tx small');if(!sm||op.querySelector('.bdg'))return;var n=R.by[id];if(n<MIN)return;
       var sp=document.createElement('span'),isb=R.best===id;sp.className='bdg '+(isb?'a':'b');sp.textContent=isb?'🔥 الأكثر مبيعاً':R.pct(id)+'% من الطلبات';sm.appendChild(sp);
@@ -1179,12 +1196,12 @@ if(s0!='ar')setLang(s0);else setLang('ar');
     }
   }
   function load(){
-    var c=null;try{c=JSON.parse(localStorage.getItem('hn_stats')||'null')}catch(e){}
+    var c=null;try{c=JSON.parse(localStorage.getItem('hn_stats2')||'null')}catch(e){}
     if(c&&c.d&&Date.now()-c.t<9e5){DATA=c.d;apply();return}
     var ac=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(ac)ac.abort()},7000);
     fetch(URL,ac?{signal:ac.signal}:{}).then(function(r){return r.json()}).then(function(d){
       clearTimeout(tm);if(!d||!d.ok||!d.c)return;DATA=d;
-      try{localStorage.setItem('hn_stats',JSON.stringify({t:Date.now(),d:d}))}catch(e){}apply();
+      try{localStorage.setItem('hn_stats2',JSON.stringify({t:Date.now(),d:d}))}catch(e){}apply();
     }).catch(function(){});
   }
   var pl=$('pl');if(pl&&window.MutationObserver)new MutationObserver(apply).observe(pl,{childList:true});
