@@ -403,6 +403,51 @@ details[open] p{animation:fi .4s ease both}
 .buy .bar i{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,var(--am),#ff9f0a);transition:width 1.2s cubic-bezier(.2,.7,.2,1) .3s}
 .buy.go .bar i{width:var(--w,0%)}
 .card.bestc{border-color:var(--am);box-shadow:0 22px 56px rgba(255,159,10,.18)}
+.mr{--p:0;--t:0;flex:none;width:50px;height:50px;border-radius:50%;background:conic-gradient(var(--am) calc(var(--p)*1%),rgba(255,255,255,.13) 0);display:grid;place-items:center;position:relative;transition:--p 1.3s cubic-bezier(.2,.7,.2,1) .3s}
+.mr:before{content:"";position:absolute;inset:5px;border-radius:50%;background:#0a1740}.mr b{position:relative;font-size:12.5px;color:#fff;font-weight:900}
+.buy.go .mr{--p:var(--t)}
+@property --p{syntax:'<number>';inherits:false;initial-value:0}
+.pulse{margin:6px 0 40px;padding:26px clamp(14px,3vw,30px) 30px;border-radius:28px;background:radial-gradient(120% 90% at 50% 0%,rgba(61,220,255,.1),transparent 60%),linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.12);box-shadow:0 30px 80px rgba(0,0,0,.35);position:relative;overflow:hidden}
+.pulse[hidden]{display:none}
+.ph{text-align:center;display:grid;gap:8px;justify-items:center;margin-bottom:22px}
+.ph .kk{font-size:13px;font-weight:800;color:var(--am2);letter-spacing:.3px}.ph h3{margin:0;font-size:clamp(22px,3.4vw,34px);line-height:1.3}.ph h3 em{font-style:normal;color:var(--gr)}
+.ph p{margin:0;color:#b9c8ee;font-size:14.5px}.pill{margin-top:4px;padding:6px 14px;border-radius:99px;background:rgba(255,194,26,.12);border:1px solid rgba(255,194,26,.4);color:#ffe9a8;font-weight:800;font-size:13.5px}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,34px)}
+@media(max-width:900px){.pgrid{grid-template-columns:1fr}}
+.pn{--ac:#3ddcff;padding:18px;border-radius:22px;background:rgba(6,14,40,.55);border:1px solid rgba(255,255,255,.08)}
+.pn h4{margin:0 0 14px;text-align:center;font-size:15.5px;color:#dbe6ff}
+.pw{display:grid;grid-template-columns:minmax(190px,280px) 1fr;gap:18px;align-items:center}
+@media(max-width:560px){.pw{grid-template-columns:1fr;justify-items:center}.pw .lgdx{width:100%}}
+.pg{position:relative;width:100%;max-width:280px;aspect-ratio:1;margin-inline:auto}
+.pg svg{width:100%;height:100%;display:block;overflow:visible}
+.pg circle{fill:none;stroke-linecap:round}.pg .tr{stroke:rgba(255,255,255,.07)}
+.pg .pa{stroke-dasharray:0 var(--c);transition:stroke-dasharray 1.5s cubic-bezier(.2,.7,.2,1) calc(var(--i)*.16s),opacity .35s,filter .35s;cursor:pointer}
+.pn.go .pa{stroke-dasharray:var(--d) var(--c)}
+.pg .pa.dim{opacity:.32}.pg .pa.on{filter:drop-shadow(0 0 9px var(--ac))}
+.ct{position:absolute;inset:0;display:grid;place-content:center;text-align:center;gap:2px;padding:0 22%;pointer-events:none}
+.ct .big{font-size:clamp(30px,4.2vw,44px);font-weight:900;line-height:1;color:#fff;text-shadow:0 0 22px var(--ac)}
+.ct .nm{font-size:11.5px;font-weight:800;color:var(--ac);line-height:1.35}.ct .sb{font-size:10.5px;color:#aebde6}
+.lgdx{display:grid;gap:8px}
+.lgx{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#dbe6ff;font:inherit;font-size:13px;cursor:pointer;text-align:start;transition:.25s}
+.lgx .dt{width:11px;height:11px;border-radius:50%;background:var(--c);box-shadow:0 0 10px var(--c);flex:none}
+.lgx .ln{font-weight:800;flex:1 1 120px;color:#fff}.lgx .lc{color:#9fb1de;font-size:12px}.lgx .lp{color:var(--c);font-size:15px;min-width:40px;text-align:end}
+.lgx .hf{font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;background:rgba(255,194,26,.16);color:#ffd24a}
+.lgx:hover,.lgx.on{background:rgba(255,255,255,.1);border-color:var(--c);transform:translateX(-3px)}
+.lgx:focus-visible{outline:2px solid var(--gr);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.pg .pa,.mr{transition:none}.lgx:hover,.lgx.on{transform:none}}
+
+.pw{display:grid;grid-template-columns:1fr;gap:20px;justify-items:center}
+.pg{max-width:300px}.pg.dn circle{stroke-linecap:butt}
+.lgdx{width:100%;grid-template-rows:repeat(4,56px);gap:8px}
+.lgx{display:grid;grid-template-columns:12px minmax(0,1fr) auto 54px;align-items:center;gap:10px;height:56px;padding:0 14px;font-size:13px;line-height:1.35}
+.lgx .ln{flex:none;min-width:0}.lgx .lc{white-space:nowrap}.lgx .lp{min-width:0;text-align:end;font-size:16px}
+.ct .tg{font-size:10.5px;font-weight:800;color:#ffd24a;margin-bottom:4px;white-space:nowrap}
+.pgrid{align-items:stretch}.pn{display:flex;flex-direction:column}.pn .pw{flex:1;align-content:start}
+@media(max-width:560px){.lgx{padding:0 10px;gap:8px;font-size:12px}.lgx .lc{font-size:11px}}
+
+.pg:not(.dn) .ct{padding:0 30%}.pg:not(.dn) .big{font-size:clamp(26px,3.4vw,34px)}.pg:not(.dn) .nm{font-size:9.5px}.pg:not(.dn) .sb{display:none}.pg:not(.dn) .tg{font-size:9px}
+.pg.dn .ct{padding:0 27%}.pg.dn .big{font-size:clamp(28px,3.6vw,38px)}.pg.dn .nm{font-size:10.5px}
+
 .bs1{margin-top:14px;padding:12px 16px;border-radius:18px;background:linear-gradient(135deg,rgba(255,194,26,.14),rgba(47,128,255,.08));border:1px solid rgba(255,194,26,.4);color:#ffe9a8;font-weight:700;font-size:14.5px;line-height:1.7;width:fit-content;max-width:100%}
 .bs1[hidden]{display:none}.bs1 .k{display:block;color:var(--am2);font-size:12.5px;font-weight:800}
 .bs1 .v{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px}.bs1 em{font-style:normal;color:#fff;font-weight:900;font-size:16px}
@@ -448,8 +493,8 @@ details[open] p{animation:fi .4s ease both}
 
 <section class="alt" id="courses"><div class="c">
 <div class="sh rv"><span class="kick">الدورات والحقائب</span><h2>اختر دوراتك بنفسك <em>ووفّر أكثر</em></h2><p>اختر الدورات اللي تحتاجها: دورتان = حقيبة المهندس، 3 دورات = حقيبة المهندس برو، والدورات الأربع = حقيبة المهندس PROMAX.</p></div>
+<div class="pulse" id="pulse" hidden></div>
 <div class="g3" id="packs"></div>
-<div class="bs1 kst" id="kst" hidden></div>
 <div class="sub3" style="margin-top:44px">الدورات المتوفرة — 5,000 دج للدورة</div>
 <div class="g2" id="singles"></div>
 </div></section>
@@ -928,7 +973,7 @@ var D=[
 ["الدورات","Cours","Courses"],["الأستاذ","Formateur","Instructor"],["الآراء","Avis","Reviews"],["المحتوى","Contenu","Content"],["المتابعة","Suivi","Support"],["الأسئلة","Questions","FAQ"],
 ["اكتب الاسم واللقب","Saisissez votre nom et prénom","Enter your full name"],["مثال: 06xxxxxxxx","Ex. : 06xxxxxxxx","e.g. 06xxxxxxxx"],["رقم احتياطي","Numéro de secours","Backup number"],["اكتب اسم بلديتك","Saisissez le nom de votre commune","Type your commune name"],
 ["اطلب الآن","Commander","Order now"],["🔥 الأكثر مبيعاً","🔥 Meilleure vente","🔥 Best seller"],["الدورة الأكثر مبيعاً","Formation la plus vendue","Best-selling course"],
-["طلبها {0} طالب","Commandée par {0} étudiants","Ordered by {0} students"],["{0}% من الطلبات","{0}% des commandes","{0}% of orders"],["{0} طلب مسجّل","{0} commandes enregistrées","{0} orders placed"],["اختارها {0} طالب","Choisi par {0} étudiants","Chosen by {0} students"],["🔥 الأكثر طلباً","🔥 Le plus demandé","🔥 Most ordered"],["☝️ الدورة وحدها","☝️ Un seul cours","☝️ Single course"],["{0} طلب","{0} commandes","{0} orders"],["توزيع الطلبات حسب العرض","Répartition des commandes par offre","Orders by offer"],
+["طلبها {0} طالب","Commandée par {0} étudiants","Ordered by {0} students"],["{0}% من الطلبات","{0}% des commandes","{0}% of orders"],["{0} طلب مسجّل","{0} commandes enregistrées","{0} orders placed"],["🔥 الأرقام تتكلم","🔥 Les chiffres parlent","🔥 The numbers speak"],["هكذا يختار الطلبة","Voici comment les étudiants choisissent","This is how students choose"],["دوراتهم","leurs formations","their courses"],["أرقام حقيقية من طلبات الموقع، تتحدّث تلقائياً","Chiffres réels issus des commandes du site, mis à jour automatiquement","Real figures from site orders, updated automatically"],["حصة كل دورة من الطلبات","Part de chaque cours dans les commandes","Share of orders per course"],["أكثر العروض اختياراً","Offres les plus choisies","Most chosen offers"],["الدورة وحدها","Un seul cours","Single course"],["اختارها {0} طالب","Choisi par {0} étudiants","Chosen by {0} students"],["🔥 الأكثر طلباً","🔥 Le plus demandé","🔥 Most ordered"],["☝️ الدورة وحدها","☝️ Un seul cours","☝️ Single course"],["{0} طلب","{0} commandes","{0} orders"],["توزيع الطلبات حسب العرض","Répartition des commandes par offre","Orders by offer"],
 ["🛒 اطلب الآن","🛒 Commander","🛒 Order now"],
 ["💾 دورات تطبيقية مسجلة في فلاشة","💾 Formations pratiques enregistrées sur clé USB","💾 Hands-on recorded courses on a USB drive"],
 ["حقيبة","Le pack de l’","The"],["المهندس","ingénieur","Engineer’s Pack"],["من الصفر إلى الاحتراف","de zéro à l’expertise","from zero to pro"],
@@ -1164,7 +1209,7 @@ if(s0!='ar')setLang(s0);else setLang('ar');
       [].forEach.call(card.querySelectorAll('.buy,.rb.bsl'),function(x){x.remove()});card.classList.remove('bestc');
       var n=R.by[id];if(n<MIN)return;
       var el=document.createElement('div');el.className='buy';
-      el.innerHTML='<div class="r"><span>👥</span><span>طلبها '+fm(n)+' طالب</span><span class="pc">'+R.pct(id)+'% من الطلبات</span></div><div class="bar"><i style="--w:'+R.pct(id)+'%"></i></div>';
+      el.innerHTML='<div class="r"><span class="mr" style="--t:'+R.pct(id)+'"><b>'+R.pct(id)+'%</b></span><span>طلبها '+fm(n)+' طالب</span></div>';
       card.insertBefore(el,card.querySelector('.pr'));
       if(R.best===id){card.classList.add('bestc');var rb=document.createElement('span');rb.className='rb bsl';rb.textContent='🔥 الأكثر مبيعاً';card.insertBefore(rb,card.firstChild)}
       requestAnimationFrame(function(){requestAnimationFrame(function(){el.classList.add('go')})});
@@ -1174,16 +1219,12 @@ if(s0!='ar')setLang(s0);else setLang('ar');
       [].forEach.call(card.querySelectorAll('.buy,.rb.bsl'),function(x){x.remove()});card.classList.remove('bestc');
       var n=R.kc[k];if(n<MIN)return;
       var el=document.createElement('div');el.className='buy';
-      el.innerHTML='<div class="r"><span>👥</span><span>اختارها '+fm(n)+' طالب</span><span class="pc">'+R.kpct(k)+'% من الطلبات</span></div><div class="bar"><i style="--w:'+R.kpct(k)+'%"></i></div>';
+      el.innerHTML='<div class="r"><span class="mr" style="--t:'+R.kpct(k)+'"><b>'+R.kpct(k)+'%</b></span><span>اختارها '+fm(n)+' طالب</span></div>';
       card.insertBefore(el,card.querySelector('.pr'));
       if(R.kbest===k){card.classList.add('bestc');if(!card.querySelector('.rb')){var rb=document.createElement('span');rb.className='rb bsl';rb.textContent='🔥 الأكثر طلباً';card.insertBefore(rb,card.firstChild)}}
       requestAnimationFrame(function(){requestAnimationFrame(function(){el.classList.add('go')})});
     });
-    var ks=$('kst');if(ks){
-      if(R.kc[1]>=MIN){
-        ks.innerHTML='<span class="k"><span>☝️ الدورة وحدها</span></span><div class="v"><span>'+fm(R.kc[1])+' طلب</span><span>'+R.kpct(1)+'% من الطلبات</span></div>';ks.hidden=false;
-      }else ks.hidden=true;
-    }
+    pulse(R);
     [].forEach.call(document.querySelectorAll('#pl .op[data-sp]'),function(op){
       var id=op.dataset.sp,sm=op.querySelector('.tx small');if(!sm||op.querySelector('.bdg'))return;var n=R.by[id];if(n<MIN)return;
       var sp=document.createElement('span'),isb=R.best===id;sp.className='bdg '+(isb?'a':'b');sp.textContent=isb?'🔥 الأكثر مبيعاً':R.pct(id)+'% من الطلبات';sm.appendChild(sp);
@@ -1203,6 +1244,56 @@ if(s0!='ar')setLang(s0);else setLang('ar');
       clearTimeout(tm);if(!d||!d.ok||!d.c)return;DATA=d;
       try{localStorage.setItem('hn_stats2',JSON.stringify({t:Date.now(),d:d}))}catch(e){}apply();
     }).catch(function(){});
+  }
+  var COL={rsa:'#3ddcff',cmh:'#ffd24a',acd:'#ff9f0a',cad:'#7aa8ff'};
+  var OFF=[{k:4,n:'حقيبة المهندس PROMAX',c:'#ffd24a'},{k:3,n:'حقيبة المهندس برو',c:'#3ddcff'},{k:2,n:'حقيبة المهندس',c:'#7aa8ff'},{k:1,n:'الدورة وحدها',c:'#ff9f0a'}];
+  var RM=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches,PSIG='',PT=[];
+  function countTo(el,v,suf){if(RM){el.textContent=v+suf;return}var t0=performance.now(),d=700;(function f(t){var q=Math.min(1,(t-t0)/d),e=1-Math.pow(1-q,3);el.textContent=Math.round(v*e)+suf;if(q<1)requestAnimationFrame(f)})(t0)}
+  function ringSvg(items,rad,sw,gap,donut){
+    var out='<svg viewBox="0 0 320 320" aria-hidden="true"><g transform="rotate(-90 160 160)">',cum=0;
+    items.forEach(function(it,i){
+      var r=donut?rad[0]:rad[i],c=2*Math.PI*r,len=it.share*c;
+      out+='<circle class="tr" cx="160" cy="160" r="'+r+'" stroke-width="'+sw+'"'+(donut?' style="opacity:0"':'')+'/>';
+      var dl=donut?Math.max(0,len-gap):len,off=donut?-cum:0;if(donut)cum+=len;
+      out+='<circle class="pa" data-i="'+i+'" cx="160" cy="160" r="'+r+'" stroke-width="'+sw+'" stroke="'+it.c+'" style="--c:'+c.toFixed(1)+';--d:'+dl.toFixed(1)+';--i:'+i+(donut?';stroke-dashoffset:'+off.toFixed(1):'')+'"/>';
+    });
+    return out+'</g></svg>';
+  }
+  function panel(title,items,rad,sw,gap,donut){
+    var best=-1,mx=0;items.forEach(function(x,i){if(x.n>mx){mx=x.n;best=i}});
+    var lg=items.map(function(x,i){return '<button type="button" class="lgx" data-i="'+i+'" style="--c:'+x.c+'"><i class="dt"></i><span class="ln">'+x.name+'</span>'+'<span class="lc">'+fm(x.n)+' طلب</span><b class="lp">'+x.pc+'%</b></button>'}).join('');
+    return '<div class="pn"><h4>'+title+'</h4><div class="pw"><div class="pg'+(donut?' dn':'')+'">'+ringSvg(items,rad,sw,gap,donut)+'<div class="ct"><span class="tg">'+(donut?'🔥 الأكثر طلباً':'🔥 الأكثر مبيعاً')+'</span><b class="big">0%</b><span class="nm"></span><small class="sb"></small></div></div><div class="lgdx">'+lg+'</div></div></div>';
+  }
+  function pulse(R){
+    var h=$('pulse');if(!h)return;
+    var kt=R.kc[1]+R.kc[2]+R.kc[3]+R.kc[4];
+    if(R.tot<20||kt<20){h.hidden=true;return}
+    var sig=JSON.stringify([R.by,R.kc,R.tot]);if(sig===PSIG)return;PSIG=sig;
+    PT.forEach(clearInterval);PT=[];
+    var cs=IDS.slice().sort(function(a,b){return R.by[b]-R.by[a]}).map(function(id){return {id:id,name:NAME[id],n:R.by[id],pc:R.pct(id),share:R.by[id]/R.tot,c:COL[id],sub:'طلبها '+fm(R.by[id])+' طالب'}});
+    var os=OFF.map(function(o){return {name:o.n,n:R.kc[o.k],pc:R.kpct(o.k),share:R.kc[o.k]/kt,c:o.c,sub:'اختارها '+fm(R.kc[o.k])+' طالب'}});
+    h.innerHTML='<div class="ph"><span class="kk">🔥 الأرقام تتكلم</span><h3>هكذا يختار الطلبة <em>دوراتهم</em></h3><p>أرقام حقيقية من طلبات الموقع، تتحدّث تلقائياً</p><span class="pill">'+fm(R.tot)+' طلب مسجّل</span></div><div class="pgrid">'+
+      panel('حصة كل دورة من الطلبات',cs,[142,120,98,76],15,0,false)+panel('أكثر العروض اختياراً',os,[104],44,5,true)+'</div>';
+    h.hidden=false;
+    [].forEach.call(h.querySelectorAll('.pn'),function(pn,pi){
+      var data=pi?os:cs,pas=pn.querySelectorAll('.pa'),lgs=pn.querySelectorAll('.lgx'),big=pn.querySelector('.big'),nm=pn.querySelector('.nm'),sb=pn.querySelector('.sb'),tg=pn.querySelector('.tg'),cur=-1,hold=false;
+      var best=0;data.forEach(function(x,i){if(x.n>data[best].n)best=i});
+      function act(i,anim){cur=i;var x=data[i];
+        [].forEach.call(pas,function(a,j){a.classList.toggle('on',j===i);a.classList.toggle('dim',j!==i)});
+        [].forEach.call(lgs,function(l,j){l.classList.toggle('on',j===i)});
+        pn.style.setProperty('--ac',x.c);tg.style.visibility=i===best?'visible':'hidden';nm.textContent=x.name;sb.textContent=x.sub;
+        if(anim)countTo(big,x.pc,'%');else big.textContent=x.pc+'%'}
+      [].forEach.call(lgs,function(l,i){
+        l.addEventListener('mouseenter',function(){hold=true;act(i,1)});l.addEventListener('focus',function(){hold=true;act(i,1)});
+        l.addEventListener('click',function(){hold=true;act(i,1)});l.addEventListener('mouseleave',function(){hold=false});
+      });
+      [].forEach.call(pas,function(a,i){a.addEventListener('mouseenter',function(){hold=true;act(i,1)});a.addEventListener('mouseleave',function(){hold=false})});
+      pn.addEventListener('touchstart',function(){hold=true;setTimeout(function(){hold=false},6000)},{passive:true});
+      act(best,0);
+      var started=false;function start(){if(started)return;started=true;pn.classList.add('go');act(best,1);
+        if(!RM)PT.push(setInterval(function(){if(hold||document.hidden)return;act((cur+1)%data.length,1)},3400))}
+      if('IntersectionObserver' in window){var io=new IntersectionObserver(function(en){if(en[0].isIntersecting){io.disconnect();start()}},{threshold:.35});io.observe(pn)}else start();
+    });
   }
   var pl=$('pl');if(pl&&window.MutationObserver)new MutationObserver(apply).observe(pl,{childList:true});
   load();
