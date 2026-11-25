@@ -463,6 +463,32 @@ details[open] p{animation:fi .4s ease both}
 @keyframes mspin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.tp::before{animation:none}}
 
+/* ===== مجسّمات ثلاثية الأبعاد ===== */
+.chip[data-m]{cursor:pointer;position:relative;overflow:hidden;text-align:start;font-family:inherit;color:inherit}
+.chip[data-m]:after{content:"3D";position:absolute;top:6px;inset-inline-end:8px;font-size:10px;font-weight:900;letter-spacing:.5px;color:#06122e;background:linear-gradient(135deg,#ffd24a,#ff9f0a);padding:1px 7px;border-radius:99px}
+.chip[data-m]:hover,.chip[data-m]:focus-visible{border-color:#ffd24a;box-shadow:0 0 0 3px rgba(255,210,74,.18),0 10px 30px rgba(0,0,0,.35)}
+.chip[data-m]:focus-visible{outline:none}
+.m3h{position:relative;width:100%;text-align:center;font-size:12.5px;font-weight:700;color:#ffe9a8;margin-top:-4px}
+#m3d{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:rgba(2,6,24,.84);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);animation:m3in .3s ease both}
+#m3d[hidden]{display:none}
+@keyframes m3in{from{opacity:0}to{opacity:1}}
+.m3c{width:min(980px,96vw);height:min(700px,92vh);display:flex;flex-direction:column;border-radius:26px;overflow:hidden;background:radial-gradient(120% 80% at 50% 0%,#10306f,#050f2e 70%);border:1px solid rgba(61,220,255,.4);box-shadow:0 40px 120px rgba(0,0,0,.6)}
+.m3t{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.1);flex-wrap:wrap}
+.m3t .tabs{display:flex;gap:8px;flex:1;flex-wrap:wrap}
+.m3t .tabs button{font:inherit;font-size:13px;font-weight:800;color:#cfe0ff;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);padding:8px 14px;border-radius:99px;cursor:pointer;transition:.2s}
+.m3t .tabs button.on{color:#06122e;background:linear-gradient(135deg,#ffd24a,#ff9f0a);border-color:transparent}
+.m3t .tabs button:not(.on):hover{border-color:#3ddcff;color:#fff}
+.m3t .x{font:inherit;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);color:#fff;font-size:18px;cursor:pointer}
+.m3t .x:hover{background:#ff5a5a;border-color:#ff5a5a}
+.m3w{position:relative;flex:1;min-height:0;touch-action:none;cursor:grab}
+.m3w.dr{cursor:grabbing}
+.m3w canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.m3b{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;border-top:1px solid rgba(255,255,255,.1);flex-wrap:wrap}
+.m3b p{margin:0;font-size:13.5px;color:#dbe6ff;flex:1 1 300px;line-height:1.7}
+.m3b .hn{font-size:12px;color:#ffe9a8;font-weight:800}
+body.m3o{overflow:hidden}
+@media(max-width:560px){.m3c{border-radius:18px;height:94vh}.m3t .tabs button{padding:7px 11px;font-size:12px}}
+
 .bs1{margin-top:14px;padding:12px 16px;border-radius:18px;background:linear-gradient(135deg,rgba(255,194,26,.14),rgba(47,128,255,.08));border:1px solid rgba(255,194,26,.4);color:#ffe9a8;font-weight:700;font-size:14.5px;line-height:1.7;width:fit-content;max-width:100%}
 .bs1[hidden]{display:none}.bs1 .k{display:block;color:var(--am2);font-size:12.5px;font-weight:800}
 .bs1 .v{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px}.bs1 em{font-style:normal;color:#fff;font-weight:900;font-size:16px}
@@ -991,7 +1017,7 @@ var D=[
 ["الدورات","Cours","Courses"],["الأستاذ","Formateur","Instructor"],["الآراء","Avis","Reviews"],["المحتوى","Contenu","Content"],["المتابعة","Suivi","Support"],["الأسئلة","Questions","FAQ"],
 ["اكتب الاسم واللقب","Saisissez votre nom et prénom","Enter your full name"],["مثال: 06xxxxxxxx","Ex. : 06xxxxxxxx","e.g. 06xxxxxxxx"],["رقم احتياطي","Numéro de secours","Backup number"],["اكتب اسم بلديتك","Saisissez le nom de votre commune","Type your commune name"],
 ["اطلب الآن","Commander","Order now"],["🔥 الأكثر مبيعاً","🔥 Meilleure vente","🔥 Best seller"],["الدورة الأكثر مبيعاً","Formation la plus vendue","Best-selling course"],
-["طلبها {0} طالب","Commandée par {0} étudiants","Ordered by {0} students"],["{0}% من الطلبات","{0}% des commandes","{0}% of orders"],["{0} طلب مسجّل","{0} commandes enregistrées","{0} orders placed"],["🔥 الأرقام تتكلم","🔥 Les chiffres parlent","🔥 The numbers speak"],["هكذا يختار الطلبة","Voici comment les étudiants choisissent","This is how students choose"],["دوراتهم","leurs formations","their courses"],["أرقام حقيقية من طلبات الموقع، تتحدّث تلقائياً","Chiffres réels issus des commandes du site, mis à jour automatiquement","Real figures from site orders, updated automatically"],["حصة كل دورة من الطلبات","Part de chaque cours dans les commandes","Share of orders per course"],["أكثر العروض اختياراً","Offres les plus choisies","Most chosen offers"],["الدورة وحدها","Un seul cours","Single course"],["🎓 دورات الأستاذ","🎓 Les cours du formateur","🎓 Courses by the instructor"],["🏗️ 11 سنة خبرة ميدانية","🏗️ 11 ans d'expérience terrain","🏗️ 11 years of field experience"],["🗣️ شرح باللهجة الجزائرية","🗣️ Explications en dialecte algérien","🗣️ Explained in Algerian dialect"],["📁 مشاريع حقيقية منجزة","📁 Vrais projets réalisés","📁 Real completed projects"],["🎓 دورات الأستاذ أمين بنقالة","🎓 Les formations du formateur Amin Bengalla","🎓 Courses by instructor Amin Bengalla"],["اختارها {0} طالب","Choisi par {0} étudiants","Chosen by {0} students"],["🔥 الأكثر طلباً","🔥 Le plus demandé","🔥 Most ordered"],["☝️ الدورة وحدها","☝️ Un seul cours","☝️ Single course"],["{0} طلب","{0} commandes","{0} orders"],["توزيع الطلبات حسب العرض","Répartition des commandes par offre","Orders by offer"],
+["طلبها {0} طالب","Commandée par {0} étudiants","Ordered by {0} students"],["{0}% من الطلبات","{0}% des commandes","{0}% of orders"],["{0} طلب مسجّل","{0} commandes enregistrées","{0} orders placed"],["🔥 الأرقام تتكلم","🔥 Les chiffres parlent","🔥 The numbers speak"],["هكذا يختار الطلبة","Voici comment les étudiants choisissent","This is how students choose"],["دوراتهم","leurs formations","their courses"],["أرقام حقيقية من طلبات الموقع، تتحدّث تلقائياً","Chiffres réels issus des commandes du site, mis à jour automatiquement","Real figures from site orders, updated automatically"],["حصة كل دورة من الطلبات","Part de chaque cours dans les commandes","Share of orders per course"],["أكثر العروض اختياراً","Offres les plus choisies","Most chosen offers"],["الدورة وحدها","Un seul cours","Single course"],["🎓 دورات الأستاذ","🎓 Les cours du formateur","🎓 Courses by the instructor"],["🏗️ 11 سنة خبرة ميدانية","🏗️ 11 ans d'expérience terrain","🏗️ 11 years of field experience"],["🗣️ شرح باللهجة الجزائرية","🗣️ Explications en dialecte algérien","🗣️ Explained in Algerian dialect"],["📁 مشاريع حقيقية منجزة","📁 Vrais projets réalisés","📁 Real completed projects"],["🎓 دورات الأستاذ أمين بنقالة","🎓 Les formations du formateur Amin Bengalla","🎓 Courses by instructor Amin Bengalla"],["👆 اضغط على أي برنامج لتشاهد مجسّمه ثلاثي الأبعاد","👆 Cliquez sur un logiciel pour voir sa maquette 3D","👆 Tap a software to see its 3D model"],["اسحب للتدوير · مرّر أو اقرص للتكبير","Glissez pour tourner · molette ou pincement pour zoomer","Drag to rotate · scroll or pinch to zoom"],["تحليل إنشائي: تحت حمولة جانبية يتحرّك المبنى وتتلوّن العناصر حسب الإجهاد، من الأزرق الهادئ إلى الأحمر المُجهَد","Analyse structurelle : sous une charge latérale, le bâtiment bouge et chaque élément change de couleur selon sa contrainte, du bleu calme au rouge sollicité","Structural analysis: under lateral load the building sways and each member changes colour with its stress, from calm blue to stressed red"],["تسليح عارضة بيتون مسلّح: الحديد الطولي ثم الكمّات تُرسَم بالتسلسل مع الأبعاد والتسميات كما في مخطط التسليح","Ferraillage d'une poutre en béton armé : barres longitudinales puis cadres, avec cotes et annotations comme sur un plan de ferraillage","Reinforced concrete beam detailing: longitudinal bars then stirrups appear in sequence with dimensions and labels, as on a rebar drawing"],["هنغار معدني: الهياكل تُركَّب واحداً بعد الآخر، ثم المرابط والتغطية","Hangar métallique : les portiques se montent un à un, puis les pannes, le contreventement et la couverture","Steel hangar: frames are erected one by one, then purlins, bracing and cladding"],["اختارها {0} طالب","Choisi par {0} étudiants","Chosen by {0} students"],["🔥 الأكثر طلباً","🔥 Le plus demandé","🔥 Most ordered"],["☝️ الدورة وحدها","☝️ Un seul cours","☝️ Single course"],["{0} طلب","{0} commandes","{0} orders"],["توزيع الطلبات حسب العرض","Répartition des commandes par offre","Orders by offer"],
 ["🛒 اطلب الآن","🛒 Commander","🛒 Order now"],
 ["💾 دورات تطبيقية مسجلة في فلاشة","💾 Formations pratiques enregistrées sur clé USB","💾 Hands-on recorded courses on a USB drive"],
 ["حقيبة","Le pack de l’","The"],["المهندس","ingénieur","Engineer’s Pack"],["من الصفر إلى الاحتراف","de zéro à l’expertise","from zero to pro"],
@@ -1387,5 +1413,126 @@ if(s0!='ar')setLang(s0);else setLang('ar');
 }catch(err){}})();
 </script>
 <script>if(!window.__ok)document.documentElement.classList.remove('js');</script>
+<script>
+(function(){
+var CH=document.querySelectorAll('.hv .chip');if(!CH.length||!document.createElement('canvas').getContext)return;
+var KEYS=['rob','cad','cm'],TT=['Robot Structural','AutoCAD Detailing','Charpente Métallique'];
+var DESC={rob:'تحليل إنشائي: تحت حمولة جانبية يتحرّك المبنى وتتلوّن العناصر حسب الإجهاد، من الأزرق الهادئ إلى الأحمر المُجهَد',
+ cad:'تسليح عارضة بيتون مسلّح: الحديد الطولي ثم الكمّات تُرسَم بالتسلسل مع الأبعاد والتسميات كما في مخطط التسليح',
+ cm:'هنغار معدني: الهياكل تُركَّب واحداً بعد الآخر، ثم المرابط والتغطية'};
+var RM=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+/* ---------- واجهة النافذة ---------- */
+var M=document.createElement('div');M.id='m3d';M.hidden=true;M.setAttribute('role','dialog');M.setAttribute('aria-modal','true');
+M.innerHTML='<div class="m3c"><div class="m3t"><div class="tabs">'+TT.map(function(n,i){return '<button type="button" data-i="'+i+'">'+n+'</button>'}).join('')+'</div><button type="button" class="x" aria-label="إغلاق">✕</button></div><div class="m3w"><canvas></canvas></div><div class="m3b"><p></p><span class="hn">اسحب للتدوير · مرّر أو اقرص للتكبير</span></div></div>';
+document.body.appendChild(M);
+var cv=M.querySelector('canvas'),ctx=cv.getContext('2d'),W=M.querySelector('.m3w'),DP=M.querySelector('.m3b p'),tabs=M.querySelectorAll('.tabs button');
+var cur=0,t0=0,raf=0,yaw=.7,pit=.42,zoom=1,vy=0,drag=false,last=null,W_=0,H_=0,dpr=1,ptrs={},pinch=0,idle=0;
+/* ---------- هندسة ---------- */
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function seg(u,a,b){return clamp((u-a)/(b-a),0,1)}
+function lerp3(a,b,f){return [a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f,a[2]+(b[2]-a[2])*f]}
+function xf(p){var cy=Math.cos(yaw),sy=Math.sin(yaw),x1=p[0]*cy+p[2]*sy,z1=-p[0]*sy+p[2]*cy,cp=Math.cos(pit),sp=Math.sin(pit);return [x1,p[1]*cp-z1*sp,p[1]*sp+z1*cp]}
+var U=40;
+function pj(p){var q=xf(p),s=16/(16+q[2]);return [W_/2+q[0]*s*U*zoom,H_*.52-q[1]*s*U*zoom,q[2],s]}
+function mkOut(){return {L:[],P:[],T:[],
+ l:function(a,b,c,w,al){this.L.push({a:a,b:b,c:c,w:w||2,al:al==null?1:al})},
+ p:function(pts,c,al){this.P.push({p:pts,c:c,al:al})},
+ t:function(p,s,c,ox,oy){this.T.push({p:p,s:s,c:c,ox:ox||0,oy:oy||0})}}}
+function grid(o,y,h,st,col){for(var v=-h;v<=h+.01;v+=st){o.l([v,y,-h],[v,y,h],col,1,.5);o.l([-h,y,v],[h,y,v],col,1,.5)}}
+function hsl(s){s=clamp(s,0,1);return 'hsl('+Math.round(205-205*s)+',95%,'+Math.round(56+8*s)+'%)'}
+/* ---------- 1) Robot: تحليل إنشائي ---------- */
+function rob(t,o){
+ var xs=[-3,0,3],zs=[-2,2],ys=[-3,-1.5,0,1.5,3],sw=Math.sin(t*1.5),A=.6*sw,amp=Math.abs(sw);
+ function d(y){var k=(y+3)/6;return A*k*k*1.15}
+ function N(i,j,k){return [xs[i]+d(ys[k]),ys[k],zs[j]]}
+ grid(o,-3.05,6,1.5,'rgba(61,220,255,.16)');
+ var i,j,k;
+ for(i=0;i<3;i++)for(j=0;j<2;j++){o.l([xs[i],-3,zs[j]],[xs[i],3,zs[j]],'rgba(255,255,255,.2)',1,.6)}
+ for(k=1;k<5;k++){var pts=[N(0,0,k),N(2,0,k),N(2,1,k),N(0,1,k)];o.p(pts,k===4?'rgba(255,210,74,.16)':'rgba(61,220,255,.09)')}
+ for(i=0;i<3;i++)for(j=0;j<2;j++)for(k=0;k<4;k++){var s=amp*(.92-.17*k)*(i===1?.78:1);o.l(N(i,j,k),N(i,j,k+1),hsl(s),5)}
+ for(k=1;k<5;k++){for(j=0;j<2;j++)for(i=0;i<2;i++){var sb=amp*(.5-.07*k)+.1+.08*Math.sin(k+i);o.l(N(i,j,k),N(i+1,j,k),hsl(sb),3.5)}
+  for(i=0;i<3;i++){var sz=amp*(.38-.05*k)+.08;o.l(N(i,0,k),N(i,1,k),hsl(sz),3)}}
+ for(i=0;i<3;i++)for(j=0;j<2;j++){var b=[xs[i],-3,zs[j]];o.l([b[0]-.35,b[1]-.01,b[2]-.3],[b[0]+.35,b[1]-.01,b[2]-.3],'#ffd24a',2);o.l([b[0]-.35,b[1]-.01,b[2]+.3],[b[0]+.35,b[1]-.01,b[2]+.3],'#ffd24a',2)}
+ var ar=1.1+.9*amp;for(j=0;j<2;j++){var h=N(0,j,4);o.l([h[0]-ar-.8,3,zs[j]],[h[0]-.15,3,zs[j]],'#ffd24a',3);o.l([h[0]-.15,3,zs[j]],[h[0]-.55,3.22,zs[j]],'#ffd24a',3);o.l([h[0]-.15,3,zs[j]],[h[0]-.55,2.78,zs[j]],'#ffd24a',3)}
+ o.t([-3.2,3.6,0],'Fx',"#ffd24a",-18,-6);o.t([3,-3.05,2],'Σ',"#9fb1de",20,18);
+ o.legend=true;
+}
+/* ---------- 2) AutoCAD: تسليح عارضة ---------- */
+function cad(t,o){
+ var u=RM?.96:(t%11)/11,ca=seg(u,0,.1),X0=-5,X1=5,hz=.8,hy=1.2;
+ grid(o,-2.4,6,1.5,'rgba(61,220,255,.18)');
+ var c=[[X0,-hy,-hz],[X1,-hy,-hz],[X1,hy,-hz],[X0,hy,-hz],[X0,-hy,hz],[X1,-hy,hz],[X1,hy,hz],[X0,hy,hz]];
+ var E=[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+ E.forEach(function(e){o.l(c[e[0]],c[e[1]],'rgba(200,225,255,'+(.55*ca)+')',1.5)});
+ if(ca>0){o.p([c[0],c[1],c[2],c[3]],'rgba(120,170,255,'+(.06*ca)+')');o.p([c[4],c[5],c[6],c[7]],'rgba(120,170,255,'+(.06*ca)+')');o.p([c[3],c[2],c[6],c[7]],'rgba(120,170,255,'+(.07*ca)+')')}
+ var bars=[[-.45,-.85],[0,-.85],[.45,-.85],[-.45,.85],[.45,.85]];
+ bars.forEach(function(b,i){var f=seg(u,.1+i*.04,.34+i*.04);if(f>0)o.l([X0+.2,b[1],b[0]],[X0+.2+(X1-X0-.4)*f,b[1],b[0]],'#ffd24a',4.5)});
+ var xs=[];for(var x=-4.7;x<=4.71;x+=Math.abs(x)>3?.35:.7)xs.push(x);
+ xs.forEach(function(x,i){var f=seg(u,.34+.44*i/xs.length,.34+.44*i/xs.length+.05);if(f<=0)return;var z=.62*f+.02,y=1.02*f+.02,col='#3ddcff';
+  var a=[x,-y,-z],b=[x,-y,z],cc=[x,y,z],d=[x,y,-z];o.l(a,b,col,2.2);o.l(b,cc,col,2.2);o.l(cc,d,col,2.2);o.l(d,a,col,2.2);
+  if(f>.95){o.l([x,y,-z],[x+.14,y-.16,-z+.14],col,2.2)}});
+ var L=seg(u,.8,.9);if(L>0){var yb=-2.1;o.l([X0,yb,hz+.5],[X1,yb,hz+.5],'rgba(255,255,255,'+L+')',1.5);o.l([X0,yb-.2,hz+.5],[X0,yb+.2,hz+.5],'rgba(255,255,255,'+L+')',1.5);o.l([X1,yb-.2,hz+.5],[X1,yb+.2,hz+.5],'rgba(255,255,255,'+L+')',1.5);
+  o.t([0,yb,hz+.5],'L = 10.00 m','rgba(255,255,255,'+L+')',0,16);o.t([X0-.4,0,hz+.4],'h = 40','rgba(255,255,255,'+L+')',-6,0);
+  o.t([-2,-.85,.45],'3 HA16','rgba(255,210,74,'+L+')',-30,34);o.t([2,.85,.45],'2 HA12','rgba(255,210,74,'+L+')',30,-30);o.t([-4.7,1.02,.6],'Cad. Ø8 e=15','rgba(61,220,255,'+L+')',-20,-34)}
+}
+/* ---------- 3) Charpente Métallique: هنغار معدني ---------- */
+function cm(t,o){
+ var u=RM?.96:(t%12)/12,zs=[-4,-2,0,2,4],hw=3,yb=-2.5,ye=.5,yr=2.3;
+ grid(o,yb-.02,6,1.5,'rgba(61,220,255,.18)');
+ var cs='#7aa8ff',rs='#ff9f0a';
+ zs.forEach(function(z,i){var g=seg(u,.04+.11*i,.04+.11*i+.1),g1=clamp(g*2,0,1),g2=clamp(g*2-1,0,1);if(g<=0)return;
+  [-hw,hw].forEach(function(x){o.l([x,yb,z],lerp3([x,yb,z],[x,ye,z],g1),cs,6)});
+  if(g2>0){[-1,1].forEach(function(s){o.l([s*hw,ye,z],lerp3([s*hw,ye,z],[0,yr,z],g2),rs,5)})}
+  [-hw,hw].forEach(function(x){o.l([x-.35,yb,z],[x+.35,yb,z],'#ffd24a',2)})});
+ var gp=seg(u,.62,.78);
+ if(gp>0){[-2.25,-1.5,-.75,0,.75,1.5,2.25].forEach(function(x){var y=ye+(yr-ye)*(1-Math.abs(x)/hw);o.l([x,y+.03,-4],lerp3([x,y+.03,-4],[x,y+.03,4],gp),'#ffd24a',2.2)});
+  [-hw,hw].forEach(function(x){o.l([x,ye,-4],lerp3([x,ye,-4],[x,ye,4],gp),'#ffd24a',2.5);o.l([x,-1,-4],lerp3([x,-1,-4],[x,-1,4],gp),'#ffd24a',2.2)})}
+ var gb=seg(u,.74,.84);
+ if(gb>0){[[-1,-4,-2],[1,2,4]].forEach(function(r){var s=r[0];o.l([s*hw,yb,r[1]],lerp3([s*hw,yb,r[1]],[s*hw,ye,r[2]],gb),'#ff5a5a',2.2);o.l([s*hw,yb,r[2]],lerp3([s*hw,yb,r[2]],[s*hw,ye,r[1]],gb),'#ff5a5a',2.2)});
+  o.l([-hw,ye,-4],lerp3([-hw,ye,-4],[0,yr,-2],gb),'#ff5a5a',2);o.l([-hw,ye,-2],lerp3([-hw,ye,-2],[0,yr,-4],gb),'#ff5a5a',2)}
+ var gc=seg(u,.82,.92);
+ if(gc>0){o.p([[-hw,ye,-4],[0,yr,-4],[0,yr,4],[-hw,ye,4]],'rgba(61,220,255,'+(.15*gc)+')');o.p([[hw,ye,-4],[0,yr,-4],[0,yr,4],[hw,ye,4]],'rgba(61,220,255,'+(.15*gc)+')')}
+ var L=seg(u,.9,.98);if(L>0){var w='rgba(255,255,255,'+L+')';o.l([-hw,yb-.3,4.6],[hw,yb-.3,4.6],w,1.5);o.t([0,yb-.3,4.6],'Portée 24 m',w,0,16);o.l([hw+.6,yb,4.2],[hw+.6,yr,4.2],w,1.5);o.t([hw+.6,(yb+yr)/2,4.2],'H = 6 m',w,34,0);o.t([0,yr,0],'IPE 400',"rgba(255,159,10,"+L+")",0,-18)}
+}
+var MODELS={rob:rob,cad:cad,cm:cm};
+/* ---------- الرسم ---------- */
+function draw(now){
+ raf=requestAnimationFrame(draw);var t=(now-t0)/1000,o=mkOut();MODELS[KEYS[cur]](t,o);
+ if(!drag&&!RM){yaw+=vy;vy*=.95;if(Math.abs(vy)<.003)vy=.0035;}
+ ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W_,H_);
+ var P=o.P.map(function(q){var pts=q.p.map(pj),z=0;pts.forEach(function(v){z+=v[2]});return {pts:pts,z:z/pts.length,c:q.c}}).sort(function(a,b){return b.z-a.z});
+ P.forEach(function(q){ctx.beginPath();q.pts.forEach(function(v,i){i?ctx.lineTo(v[0],v[1]):ctx.moveTo(v[0],v[1])});ctx.closePath();ctx.fillStyle=q.c;ctx.fill()});
+ var Ls=o.L.map(function(l){var a=pj(l.a),b=pj(l.b);return {a:a,b:b,z:(a[2]+b[2])/2,l:l}}).sort(function(a,b){return b.z-a.z});
+ ctx.lineCap='round';
+ Ls.forEach(function(s){var near=clamp(1-(s.z+8)/16,0,1),sc=(s.a[3]+s.b[3])/2,w=s.l.w*sc*(U*zoom/40)*.9+.4;
+  ctx.globalAlpha=s.l.al*(.55+.45*near);ctx.strokeStyle='rgba(0,0,0,.5)';ctx.lineWidth=w+1.6;ctx.beginPath();ctx.moveTo(s.a[0],s.a[1]);ctx.lineTo(s.b[0],s.b[1]);ctx.stroke();
+  ctx.strokeStyle=s.l.c;ctx.lineWidth=w;ctx.stroke()});
+ ctx.globalAlpha=1;ctx.direction='ltr';ctx.font='700 13px Cairo,Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+ o.T.forEach(function(l){var p=pj(l.p),x=p[0]+l.ox,y=p[1]+l.oy;if(l.ox||l.oy){ctx.strokeStyle=l.c;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(x,y);ctx.stroke()}
+  var w=ctx.measureText(l.s).width+14;ctx.fillStyle='rgba(5,14,44,.82)';ctx.beginPath();ctx.roundRect?ctx.roundRect(x-w/2,y-11,w,22,11):ctx.rect(x-w/2,y-11,w,22);ctx.fill();ctx.fillStyle=l.c;ctx.fillText(l.s,x,y+.5)});
+ if(o.legend){var g=ctx.createLinearGradient(16,0,136,0);g.addColorStop(0,hsl(0));g.addColorStop(.5,hsl(.5));g.addColorStop(1,hsl(1));ctx.fillStyle=g;ctx.fillRect(16,H_-34,120,8);ctx.fillStyle='#cfe0ff';ctx.font='700 11px Cairo,Arial';ctx.textAlign='left';ctx.fillText('σ  min',16,H_-44);ctx.textAlign='right';ctx.fillText('max',136,H_-44)}
+}
+function fit(){var r=W.getBoundingClientRect();dpr=Math.min(2,window.devicePixelRatio||1);W_=r.width;H_=r.height;cv.width=Math.round(W_*dpr);cv.height=Math.round(H_*dpr);U=Math.min(W_/10.5,H_/11.5)}
+function show(i){cur=i;t0=performance.now();tabs.forEach(function(b,j){b.classList.toggle('on',j===i)});DP.textContent=DESC[KEYS[i]];var V0=[[.7,.42],[.5,.36],[.55,.3]][i];yaw=V0[0];pit=V0[1];zoom=1;vy=.0035;
+ var tr=window.__tr;if(typeof tr==='function')try{tr(M)}catch(e){}}
+function open(i){M.hidden=false;document.body.classList.add('m3o');fit();show(i);cancelAnimationFrame(raf);raf=requestAnimationFrame(draw);M.querySelector('.x').focus()}
+function close(){M.hidden=true;document.body.classList.remove('m3o');cancelAnimationFrame(raf)}
+/* ---------- التفاعل ---------- */
+CH.forEach(function(c,i){c.setAttribute('data-m',KEYS[i]);c.setAttribute('role','button');c.setAttribute('tabindex','0');
+ c.addEventListener('click',function(){open(i)});c.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();open(i)}})});
+var hv=document.querySelector('.hv .chips');if(hv){var h=document.createElement('div');h.className='m3h';h.textContent='👆 اضغط على أي برنامج لتشاهد مجسّمه ثلاثي الأبعاد';hv.parentNode.insertBefore(h,hv.nextSibling)}
+tabs.forEach(function(b,i){b.addEventListener('click',function(){show(i)})});
+M.querySelector('.x').addEventListener('click',close);M.addEventListener('click',function(e){if(e.target===M)close()});
+document.addEventListener('keydown',function(e){if(!M.hidden&&e.key==='Escape')close()});
+window.addEventListener('resize',function(){if(!M.hidden)fit()});
+W.addEventListener('pointerdown',function(e){W.setPointerCapture(e.pointerId);ptrs[e.pointerId]=[e.clientX,e.clientY];drag=true;W.classList.add('dr');vy=0;if(Object.keys(ptrs).length===2){var k=Object.keys(ptrs);pinch=Math.hypot(ptrs[k[0]][0]-ptrs[k[1]][0],ptrs[k[0]][1]-ptrs[k[1]][1])}});
+W.addEventListener('pointermove',function(e){var p=ptrs[e.pointerId];if(!p)return;var ks=Object.keys(ptrs);
+ if(ks.length===2){ptrs[e.pointerId]=[e.clientX,e.clientY];var d=Math.hypot(ptrs[ks[0]][0]-ptrs[ks[1]][0],ptrs[ks[0]][1]-ptrs[ks[1]][1]);if(pinch)zoom=clamp(zoom*d/pinch,.55,2.4);pinch=d;return}
+ var dx=e.clientX-p[0],dy=e.clientY-p[1];ptrs[e.pointerId]=[e.clientX,e.clientY];yaw+=dx*.009;pit=clamp(pit+dy*.007,-.25,1.2);vy=dx*.0015});
+function up(e){delete ptrs[e.pointerId];if(!Object.keys(ptrs).length){drag=false;W.classList.remove('dr')}pinch=0}
+W.addEventListener('pointerup',up);W.addEventListener('pointercancel',up);
+W.addEventListener('wheel',function(e){e.preventDefault();zoom=clamp(zoom*(e.deltaY<0?1.08:.93),.55,2.4)},{passive:false});
+})();
+</script>
 </body>
 </html>
